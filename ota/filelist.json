@@ -1,0 +1,104 @@
+{
+    "files": {
+        "weditor/xwk-logo.png": {
+            "size": 3399,
+            "hash": "656c62f8662dd679efd33b72c152272a"
+        },
+        "weditor/start.py": {
+            "size": 16221,
+            "hash": "a27c46937fde9cad1e4d91e5d5bac33f"
+        },
+        "weditor/index.html": {
+            "size": 2942,
+            "hash": "946f84d985cfed844db00b63b28d6de1"
+        },
+        "weditor/pmanager.py": {
+            "size": 1550,
+            "hash": "27e234a3f80acd69b75812e972f2d2eb"
+        },
+        "weditor/style.css": {
+            "size": 4539,
+            "hash": "0380318e96e56ab209b33d9433595d5c"
+        },
+        "weditor/js/webrepl.min.js": {
+            "size": 5123,
+            "hash": "c380c353ea1385bc77deb3655ddd382f"
+        },
+        "weditor/js/actions.js": {
+            "size": 8310,
+            "hash": "8576b550f4127773759d821826c8c164"
+        },
+        "weditor/js/script.js": {
+            "size": 7429,
+            "hash": "ba4d3ab63a23152656f95ff4f96f334a"
+        },
+        "weditor/js/term.min.js": {
+            "size": 61494,
+            "hash": "5e3bfc52fa0df64427e2202e9f411a76"
+        },
+        "weditor/js/webrepl_auto.js": {
+            "size": 2557,
+            "hash": "4964785eee891a150fcac5a22e8026fc"
+        },
+        "selftest.py": {
+            "size": 3678,
+            "hash": "f344e09e8ea82358111e40ca4c167eee"
+        },
+        "webrepl_cfg.py": {
+            "size": 10,
+            "hash": "dc21618ef6bd888b2ea68a4b19713304"
+        },
+        "doc/README.md": {
+            "size": 853,
+            "hash": "4582b8b7da96448f7fb961ea953cd486"
+        },
+        "lib/ini_parser.py": {
+            "size": 2519,
+            "hash": "b47ac690a8e64d875c598b18ed37bb56"
+        },
+        "lib/ST7735.py": {
+            "size": 31245,
+            "hash": "c707a3076badc52141986dfd904c5f55"
+        },
+        "lib/sysfont.py": {
+            "size": 8395,
+            "hash": "59f6aa16bfabfa06e3c21abebeb27b34"
+        },
+        "lib/xwk_json.py": {
+            "size": 3301,
+            "hash": "f551d3c3dd0327a1d38fe0c1ba892964"
+        },
+        "lib/selftest.py": {
+            "size": 820,
+            "hash": "aec89bf4ed8f0d551825425521adcedd"
+        },
+        "lib/hcsr04.py": {
+            "size": 3400,
+            "hash": "f924b0080583386cc66ae9336e1268d4"
+        },
+        "lib/microWebSrv.py": {
+            "size": 34127,
+            "hash": "2b3a30076e982ecf1c6f3da8e3519426"
+        },
+        "lib/bot.py": {
+            "size": 26207,
+            "hash": "af8a7d61554e352c52c671c0d44af7e8"
+        },
+        "lib/menu.py": {
+            "size": 5453,
+            "hash": "4a1ff3f9a5dc5d767aec1e79f4b163b9"
+        },
+        "lib/VL53L0X.py": {
+            "size": 9214,
+            "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
+        },
+        "linefollower.py": {
+            "size": 765,
+            "hash": "04503420a82c61667383df67ca32841f"
+        },
+        "boot.py": {
+            "size": 229,
+            "hash": "15ca9f23488321cd2d0f9e356a5a9473"
+        }
+    }
+}
