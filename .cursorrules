@@ -1,0 +1,42 @@
+# AI Rules
+rules:
+  - rule: Never remove or modify existing comments
+  - rule: Never modify unrelated code sections
+  - rule: Preserve all imports and constants
+  - rule: Follow existing code style exactly
+  - rule: Only modify specifically requested code
+
+# Custom Instructions for AI
+instructions:
+  - When uploading files, use: ampy --port /dev/ttyUSB0 put {file} {target}
+  - When resetting the ESP32, use: esptool.py --chip esp32 --port /dev/ttyUSB0 run
+  - Always verify file paths before uploading
+  - Keep all existing documentation intact
+  - Add appropriate comments for new code
+
+# Project Context
+context:
+  - This is a MicroPython project for ESP32 LED matrix control
+  - The project uses a web interface for WiFi configuration
+  - Files must be uploaded to specific directories (e.g., lib/)
+  - The system boots with an intro animation before main functionality
+
+# Code Examples
+examples:
+  - name: File Upload
+    code: |
+      # Upload library file
+      ampy --port /dev/ttyUSB0 put lib/bot.py /lib/bot.py
+      
+      # Reset ESP32
+      esptool.py --chip esp32 --port /dev/ttyUSB0 run
+
+  - name: Code Modification
+    code: |
+      # Original function with preserved comments
+      def example_function():
+          """Original docstring stays intact."""
+          # Original comment stays
+          original_code()
+          # New functionality added below
+          new_code() 
