@@ -1,3 +1,4 @@
+import gc
 import machine
 from machine import Pin, SPI, ADC, PWM
 import time
@@ -630,6 +631,12 @@ def network_setup():
             write("")  # Newline
             write("Open in your webbrowser:", color=WHITE)
             write(f"http://{ip_address}", color=CYAN)
+
+            print("Memory Free:", gc.mem_free())
+            print("Memory Allocated:", gc.mem_alloc())
+            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
+            gc.collect()  # Force garbage collection
+            print("Memory after GC:", gc.mem_free())
             
             print("\nStarting webrepl")
             try:
@@ -637,6 +644,12 @@ def network_setup():
                 webrepl.start()
             except Exception as e:
                 print("WebREPL error:", e)
+
+            print("Memory Free:", gc.mem_free())
+            print("Memory Allocated:", gc.mem_alloc())
+            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
+            gc.collect()  # Force garbage collection
+            print("Memory after GC:", gc.mem_free())                
             
             print("Starting IDE web service")
             try:
@@ -644,6 +657,12 @@ def network_setup():
             except Exception as e:
                 print("Web editor error:", e)
             
+            print("Memory Free:", gc.mem_free())
+            print("Memory Allocated:", gc.mem_alloc())
+            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
+            gc.collect()  # Force garbage collection
+            print("Memory after GC:", gc.mem_free())
+
             return True
         else:
             print("")
