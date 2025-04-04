@@ -237,3 +237,30 @@ function actionResetDevice() {
             showNotification("Error resetting device: " + error, 4);
         });
 }
+function actionOTAUpdate() {
+    // Disable the button during update
+    const updateButton = document.querySelector('button[onclick="actionOTAUpdate()"]');
+    updateButton.disabled = true;
+    updateButton.textContent = 'UPDATING...';
+    
+    // Send update request
+    fetch('/ota/update', {
+        method: 'POST'
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Show result
+        showNotification(data);
+        
+        // Re-enable button after delay
+        setTimeout(() => {
+            updateButton.disabled = false;
+            updateButton.textContent = 'UPDATE';
+        }, 5000);
+    })
+    .catch(error => {
+        showNotification('Update failed: ' + error);
+        updateButton.disabled = false;
+        updateButton.textContent = 'UPDATE';
+    });
+}

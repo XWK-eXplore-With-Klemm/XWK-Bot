@@ -471,6 +471,40 @@ def reset_device(httpClient, httpResponse):
         )
         return
 
+@MicroWebSrv.route('/ota/update', 'POST')
+def ota_update(httpClient, httpResponse):
+    try:
+        from lib.ota import OTAUpdater
+        updater = OTAUpdater()
+        success = updater.update_all()
+        
+        if success:
+            httpResponse.WriteResponse(
+                code=200,
+                headers={"Access-Control-Allow-Origin": "*"},
+                contentType="text/plain",
+                contentCharset="UTF-8",
+                content="OTA update completed successfully"
+            )
+        else:
+            httpResponse.WriteResponse(
+                code=500,
+                headers={"Access-Control-Allow-Origin": "*"},
+                contentType="text/plain",
+                contentCharset="UTF-8",
+                content="OTA update failed"
+            )
+    except Exception as e:
+        import sys
+        sys.print_exception(e)
+        httpResponse.WriteResponse(
+            code=500,
+            headers={"Access-Control-Allow-Origin": "*"},
+            contentType="text/plain",
+            contentCharset="UTF-8",
+            content=f"OTA update error: {str(e)}"
+        )
+
 mws = MicroWebSrv(webPath="/weditor")
 
 def start_debug():
