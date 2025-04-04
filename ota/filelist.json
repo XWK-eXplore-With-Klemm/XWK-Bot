@@ -5,12 +5,12 @@
             "hash": "656c62f8662dd679efd33b72c152272a"
         },
         "weditor/start.py": {
-            "size": 17346,
-            "hash": "d3eff972627fd9d687a0b3686ab5fefb"
+            "size": 17476,
+            "hash": "acbda231c4a753aa053d6b57a352803d"
         },
         "weditor/index.html": {
-            "size": 3076,
-            "hash": "3731b590fc97341b758cd94aff7cce00"
+            "size": 3084,
+            "hash": "8f6c19d069fdfdb4e10c445e34e844df"
         },
         "weditor/pmanager.py": {
             "size": 1550,
@@ -85,8 +85,8 @@
             "hash": "2b3a30076e982ecf1c6f3da8e3519426"
         },
         "lib/bot.py": {
-            "size": 26207,
-            "hash": "af8a7d61554e352c52c671c0d44af7e8"
+            "size": 27067,
+            "hash": "4b60d6caf2bf0fd7b214550fca7c9797"
         },
         "lib/menu.py": {
             "size": 5453,

@@ -15,6 +15,7 @@ class OTAUpdater:
     def __init__(self):
         self.config = IniParser()
         self.filelist_url = None
+        self.base_url = None
         self.filelist = None
         
     def load_config(self):
@@ -26,7 +27,13 @@ class OTAUpdater:
             if not self.filelist_url:
                 print("Error: OTA_FILELIST not configured")
                 return False
+            # Get base URL from config
+            self.base_url = self.config.get('OTA_BASE_URL')
+            if not self.base_url:
+                print("Error: OTA_BASE_URL not configured")
+                return False
             print(f"OTA_FILELIST URL: {self.filelist_url}")
+            print(f"Base URL for files: {self.base_url}")
             return True
         except Exception as e:
             print("Error loading config:", e)
@@ -105,7 +112,7 @@ class OTAUpdater:
         # Download and update file
         try:
             print("  Downloading new version...")
-            url = f"{self.filelist_url.rsplit('/', 1)[0]}/{rel_path}"
+            url = f"{self.base_url}/{rel_path}"
             print(f"  Download URL: {url}")
             
             # Add headers to help with some servers

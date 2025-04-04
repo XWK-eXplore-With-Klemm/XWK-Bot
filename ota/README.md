@@ -1,7 +1,7 @@
 # PERFORM UPDATE
 
 - Code changes
-- > ota/generate_filelist.sh
+- > ota/ota.sh
 - commit
 
 This esp micropython robot project is now publicly hosted on github. Let's work on a KISS OTA.
