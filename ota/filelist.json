@@ -5,12 +5,12 @@
             "hash": "656c62f8662dd679efd33b72c152272a"
         },
         "weditor/start.py": {
-            "size": 16221,
-            "hash": "a27c46937fde9cad1e4d91e5d5bac33f"
+            "size": 17346,
+            "hash": "d3eff972627fd9d687a0b3686ab5fefb"
         },
         "weditor/index.html": {
-            "size": 2942,
-            "hash": "946f84d985cfed844db00b63b28d6de1"
+            "size": 3076,
+            "hash": "3731b590fc97341b758cd94aff7cce00"
         },
         "weditor/pmanager.py": {
             "size": 1550,
@@ -25,8 +25,8 @@
             "hash": "c380c353ea1385bc77deb3655ddd382f"
         },
         "weditor/js/actions.js": {
-            "size": 8310,
-            "hash": "8576b550f4127773759d821826c8c164"
+            "size": 9112,
+            "hash": "3f10107301f7a896f1e7d03ce8771bb8"
         },
         "weditor/js/script.js": {
             "size": 7429,
@@ -73,8 +73,8 @@
             "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
         "lib/ota.py": {
-            "size": 4294,
-            "hash": "ae2db97d14e89aa9eafd2fdc245755aa"
+            "size": 5093,
+            "hash": "431dee88e8883f82373c7ccfcd0ea2a7"
         },
         "lib/hcsr04.py": {
             "size": 3400,

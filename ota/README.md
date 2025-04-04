@@ -1,3 +1,9 @@
+# PERFORM UPDATE
+
+- Code changes
+- > ota/generate_filelist.sh
+- commit
+
 This esp micropython robot project is now publicly hosted on github. Let's work on a KISS OTA.
 
 How about a bash script that creates a list of all files in micropython/
@@ -34,6 +40,7 @@ except Exception as e:
 
 
 # Try a simple HTTP request first
+import urequests
 try:
     print("\nTrying simple HTTP request...")
     response = urequests.get("http://httpbin.org/get")
@@ -47,7 +54,8 @@ except Exception as e:
 
 
 
-# Try a simple HTTP request first
+# Try manual request
+import urequests
 try:
     print("\nTrying simple HTTP request...")
     response = urequests.get("http://xwk.ull.at/projects/xwk-bot/filelist.json")

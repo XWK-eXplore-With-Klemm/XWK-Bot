@@ -38,6 +38,13 @@ class OTAUpdater:
             print("Downloading filelist...")
             print(f"URL: {self.filelist_url}")
             
+            # Add headers to help with some servers
+            headers = {
+                'User-Agent': 'XWK-Bot OTA Updater',
+                'Accept': 'application/json'
+            }
+            
+            response = urequests.get(self.filelist_url, headers=headers)
             print(f"Response status: {response.status_code}")
             print(f"Response headers: {response.headers}")
             
