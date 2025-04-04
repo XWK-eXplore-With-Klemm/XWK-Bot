@@ -4,6 +4,13 @@ import urequests
 import os
 from ini_parser import IniParser
 
+# Manual Execution:
+#from lib.ota import OTAUpdater
+#updater = OTAUpdater()
+#updater.update_all()
+
+
+
 class OTAUpdater:
     def __init__(self):
         self.config = IniParser()
@@ -30,13 +37,20 @@ class OTAUpdater:
         try:
             print("Downloading filelist...")
             print(f"URL: {self.filelist_url}")
-            response = urequests.get(self.filelist_url)
+            
             print(f"Response status: {response.status_code}")
+            print(f"Response headers: {response.headers}")
+            
             if response.status_code != 200:
                 print(f"Error: HTTP {response.status_code}")
                 response.close()
                 return False
-            self.filelist = ujson.loads(response.text)
+                
+            content = response.text
+            print(f"Response content length: {len(content)}")
+            print(f"First 100 chars: {content[:100]}")
+            
+            self.filelist = ujson.loads(content)
             response.close()
             print("Filelist downloaded successfully")
             return True
@@ -86,7 +100,14 @@ class OTAUpdater:
             print("  Downloading new version...")
             url = f"{self.filelist_url.rsplit('/', 1)[0]}/{rel_path}"
             print(f"  Download URL: {url}")
-            response = urequests.get(url)
+            
+            # Add headers to help with some servers
+            headers = {
+                'User-Agent': 'XWK-Bot OTA Updater',
+                'Accept': '*/*'
+            }
+            
+            response = urequests.get(url, headers=headers)
             print(f"  Response status: {response.status_code}")
             if response.status_code != 200:
                 print(f"  Error: HTTP {response.status_code}")

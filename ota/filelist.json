@@ -72,6 +72,10 @@
             "size": 820,
             "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
+        "lib/ota.py": {
+            "size": 4294,
+            "hash": "ae2db97d14e89aa9eafd2fdc245755aa"
+        },
         "lib/hcsr04.py": {
             "size": 3400,
             "hash": "f924b0080583386cc66ae9336e1268d4"

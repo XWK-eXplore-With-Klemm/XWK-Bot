@@ -12,3 +12,49 @@ It then calls a function which
 - reboot
 
 what do you think about it? any better ideas? don't write code yet
+
+
+## DEBUG
+
+# Manual Execution:
+from lib.ota import OTAUpdater
+updater = OTAUpdater()
+updater.update_all()
+
+# Try local request
+import urequests
+try:
+    print("\nTrying local network request...")
+    # Replace with your router's IP if different
+    response = urequests.get("http://10.10.46.1")
+    print("Response status:", response.status_code)
+    response.close()
+except Exception as e:
+    print("Error:", e)
+
+
+# Try a simple HTTP request first
+try:
+    print("\nTrying simple HTTP request...")
+    response = urequests.get("http://httpbin.org/get")
+    print("Response status:", response.status_code)
+    print("Response content:", response.text)
+    response.close()
+except Exception as e:
+    print("Error:", e)
+    if hasattr(e, 'errno'):
+        print("Error number:", e.errno)
+
+
+
+# Try a simple HTTP request first
+try:
+    print("\nTrying simple HTTP request...")
+    response = urequests.get("http://xwk.ull.at/projects/xwk-bot/filelist.json")
+    print("Response status:", response.status_code)
+    print("Response content:", response.text)
+    response.close()
+except Exception as e:
+    print("Error:", e)
+    if hasattr(e, 'errno'):
+        print("Error number:", e.errno)
