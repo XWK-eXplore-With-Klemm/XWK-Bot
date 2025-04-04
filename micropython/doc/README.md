@@ -2,6 +2,8 @@
 
 Website with manual etc: https://xwk.ull.at
 
+Github repo: https://github.com/XWK-eXplore-With-Klemm/XWK-Bot
+
 For WeMos LOLIN D32 ESP32 WROOM 32
 
 # TODO
