@@ -10,7 +10,7 @@
         },
         "weditor/index.html": {
             "size": 3084,
-            "hash": "8f6c19d069fdfdb4e10c445e34e844df"
+            "hash": "a870569510b3604aeca1ea3c3b413af8"
         },
         "weditor/pmanager.py": {
             "size": 1550,
@@ -73,8 +73,8 @@
             "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
         "lib/ota.py": {
-            "size": 5093,
-            "hash": "431dee88e8883f82373c7ccfcd0ea2a7"
+            "size": 5380,
+            "hash": "27534a45397ac6288f0ef49202e06b68"
         },
         "lib/hcsr04.py": {
             "size": 3400,
