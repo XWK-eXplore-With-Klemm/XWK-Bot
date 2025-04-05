@@ -207,11 +207,13 @@ def save_file(httpClient, httpResponse):
         CHUNK_SIZE = 1024
         total_written = 0
         
-        with open(fpath, "w") as f:
+        with open(fpath, "wb") as f:  # Note: "wb" for binary write
             while True:
                 chunk = httpClient.ReadRequestContent(CHUNK_SIZE)
                 if not chunk:
                     break
+                if isinstance(chunk, str):
+                    chunk = chunk.encode('utf-8')
                 f.write(chunk)
                 total_written += len(chunk)
                 gc.collect()  # Force garbage collection after each chunk
@@ -241,7 +243,6 @@ def save_file(httpClient, httpResponse):
             contentCharset="UTF-8",
             content=json.dumps({"error": str(e)})
         )
-        return
 
 @MicroWebSrv.route('/savefileb', 'OPTIONS')
 def save_file_options(httpClient, httpResponse):

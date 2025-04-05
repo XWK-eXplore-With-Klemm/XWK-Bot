@@ -10,6 +10,7 @@
         </style>
         <script type="text/javascript" src="js/actions.js"></script>
         <script type="text/javascript" src="js/script.js"></script>
+        <script type="text/javascript" src="js/pixel_editor.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js" type="text/javascript" charset="utf-8"></script>
     </head>
     <body onkeydown="return handleKeyDown(event);">
@@ -21,7 +22,8 @@
                 LOADING FILES
             </div>
             <div id="sidebar-footer">
-                <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8x; background-color: #aaa;">RESET</button>
+                <button onclick="openPixelEditor()" style="width: 100%; margin-bottom: 8px; background-color: #ff00ff;">PIXEL EDITOR</button>
+                <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8px; background-color: #aaa;">RESET</button>
                 <button onclick="actionOTAUpdate()" style="width: 100%; margin-bottom: 20px; background-color: #aaa;">UPDATE</button>
                 <div><a href="https://xwk.ull.at">(C) 2024-2025 XWK</a></div>
                 <div><a href="https://github.com/vsolina/micropython-web-editor">MPy web editor</a></div>
