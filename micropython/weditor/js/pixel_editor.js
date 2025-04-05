@@ -173,7 +173,7 @@ function openPixelEditor() {
     // Save button
     document.getElementById('pixel-save').onclick = () => {
         // Ask for filename
-        const filename = prompt("Enter a name (use only letters, numbers and underscores):", "logo");
+        const filename = prompt("Enter a name (use only letters, numbers and underscores):", "my_image");
         if (!filename) return;  // User cancelled
         
         // Convert canvas to RGB565 binary

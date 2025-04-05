@@ -5,12 +5,12 @@
             "hash": "656c62f8662dd679efd33b72c152272a"
         },
         "weditor/start.py": {
-            "size": 17476,
-            "hash": "acbda231c4a753aa053d6b57a352803d"
+            "size": 17586,
+            "hash": "bf951ae1cf51c2f0e988c35761ea848d"
         },
         "weditor/index.html": {
-            "size": 3081,
-            "hash": "78e9dc8fc9f761976063d8025362d6fd"
+            "size": 3296,
+            "hash": "01aac748cfd74d5d102448bf166e181e"
         },
         "weditor/pmanager.py": {
             "size": 1550,
@@ -36,6 +36,10 @@
             "size": 61494,
             "hash": "5e3bfc52fa0df64427e2202e9f411a76"
         },
+        "weditor/js/pixel_editor.js": {
+            "size": 7826,
+            "hash": "f332faf253859e8ea6aec8d7565fea18"
+        },
         "weditor/js/webrepl_auto.js": {
             "size": 2557,
             "hash": "4964785eee891a150fcac5a22e8026fc"
@@ -48,9 +52,9 @@
             "size": 10,
             "hash": "dc21618ef6bd888b2ea68a4b19713304"
         },
-        "doc/README.md": {
-            "size": 959,
-            "hash": "e12752759212e453691126c6dce594d9"
+        "images/xwk.bin": {
+            "size": 304,
+            "hash": "4eeecf1ce6267842ede94104d2212ff1"
         },
         "lib/ini_parser.py": {
             "size": 2519,
@@ -85,8 +89,8 @@
             "hash": "2b3a30076e982ecf1c6f3da8e3519426"
         },
         "lib/bot.py": {
-            "size": 26284,
-            "hash": "de4aec880899e6438bb9578541b6a1ce"
+            "size": 29658,
+            "hash": "9f6353769dec8526ad36cc1d90e098a2"
         },
         "lib/menu.py": {
             "size": 5453,
@@ -97,8 +101,8 @@
             "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
         },
         "boot.py": {
-            "size": 229,
-            "hash": "15ca9f23488321cd2d0f9e356a5a9473"
+            "size": 1021,
+            "hash": "103d2ade3c956c3d01842cc39a82e244"
         }
     }
 }

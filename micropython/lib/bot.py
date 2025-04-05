@@ -146,7 +146,7 @@ def reset_terminal():
     """Reset the terminal cursor position to top of screen"""
     tft.terminal_reset()  # Use TFT's terminal reset function
 
-def image(filepath, scale=1, x=None, y=None):
+def image(filepath, scale=5, x=None, y=None):
     """Display a raw RGB565 image file on the screen
     
     Args:
