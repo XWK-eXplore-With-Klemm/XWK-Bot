@@ -608,10 +608,10 @@ def network_setup():
             write(f"{ssid}", color=CYAN)
             wlan.connect(ssid, password)
 
-            # Try to connect to WLAN for 5 seconds
+            # Try to connect to WLAN for 8 seconds
             start_time = time.time()
             #dots = 0
-            while not wlan.isconnected() and time.time() - start_time < 5:
+            while not wlan.isconnected() and time.time() - start_time < 8:
                 # Show loading animation
                 #write("." if dots == 0 else "", color=CYAN)
                 #write(".", color=GREY)
@@ -632,11 +632,7 @@ def network_setup():
             write("Open in your webbrowser:", color=WHITE)
             write(f"http://{ip_address}", color=CYAN)
 
-            print("Memory Free:", gc.mem_free())
-            print("Memory Allocated:", gc.mem_alloc())
-            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
-            gc.collect()  # Force garbage collection
-            print("Memory after GC:", gc.mem_free())
+            gc.collect()  # Force garbage collection to free memory
             
             print("\nStarting webrepl")
             try:
@@ -645,11 +641,7 @@ def network_setup():
             except Exception as e:
                 print("WebREPL error:", e)
 
-            print("Memory Free:", gc.mem_free())
-            print("Memory Allocated:", gc.mem_alloc())
-            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
-            gc.collect()  # Force garbage collection
-            print("Memory after GC:", gc.mem_free())                
+            gc.collect()  # Force garbage collection to free memory
             
             print("Starting IDE web service")
             try:
@@ -657,11 +649,7 @@ def network_setup():
             except Exception as e:
                 print("Web editor error:", e)
             
-            print("Memory Free:", gc.mem_free())
-            print("Memory Allocated:", gc.mem_alloc())
-            print("Memory Total:", gc.mem_free() + gc.mem_alloc())
-            gc.collect()  # Force garbage collection
-            print("Memory after GC:", gc.mem_free())
+            gc.collect()  # Force garbage collection to free memory
 
             return True
         else:
@@ -825,12 +813,3 @@ def start_ap_mode():
     ])
     
     srv.Start(threaded=True)
-
-# bot.write("X", color=bot.MAGENTA, newline=False)
-# bot.write("W", color=bot.BLUE, newline=False)
-# bot.write("K", color=bot.GREEN, newline=False)
-# bot.write("-", color=bot.GREY, newline=False)
-# bot.write("B", color=bot.YELLOW, newline=False)
-# bot.write("o", color=bot.RED, newline=False)
-# bot.write("t", color=bot.MAGENTA, newline=False)
-# bot.write("")
