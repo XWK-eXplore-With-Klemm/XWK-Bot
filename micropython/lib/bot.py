@@ -161,7 +161,7 @@ def image(filepath, scale=1, x=None, y=None):
         - Bytes 4+: RGB565 pixel data (2 bytes per pixel)
     """
     try:
-        # Open file once and keep it open for reading
+        # Read header and dimensions
         with open(filepath, 'rb') as f:
             # Read header (4 bytes)
             header = bytearray(4)
@@ -185,48 +185,42 @@ def image(filepath, scale=1, x=None, y=None):
             if y is None:
                 y = (tft._size[1] - scaled_height) // 2
             
-            # Allocate a small buffer for one pixel (2 bytes)
-            pixel_data = bytearray(2)
+            # Read image data (skipping header)
+            data = f.read()
             
             if scale == 1:
-                # Display directly at 1:1 scale, one line at a time
-                for sy in range(height):
-                    # Set window for this line
-                    tft._setwindowloc(
-                        (x, y + sy),
-                        (x + original_width - 1, y + sy)
-                    )
-                    
-                    # Read and display one pixel at a time
-                    for sx in range(original_width):
-                        pixel_data[0] = ord(f.read(1))
-                        pixel_data[1] = ord(f.read(1))
-                        tft._writedata(pixel_data)
+                # Display directly at 1:1 scale - fastest method
+                tft._setwindowloc((x, y), (x + original_width - 1, y + height - 1))
+                tft._writedata(data)
             else:
+                # Scale using line buffer - good balance of speed and memory
+                line_buf = bytearray(scaled_width * 2)  # 2 bytes per pixel
+                
                 # Scale and display one line at a time
                 for sy in range(height):
-                    # Read one source line into pixel array
-                    src_line = []  # Store just the pixel values
-                    for _ in range(original_width):
-                        pixel_data[0] = ord(f.read(1))
-                        pixel_data[1] = ord(f.read(1))
-                        src_line.append((pixel_data[0], pixel_data[1]))
+                    # Get source line offset
+                    src_offset = sy * original_width * 2
                     
-                    # Repeat this line scale times
+                    # Scale this line horizontally
+                    for dx in range(scaled_width):
+                        # Map x coordinate back to source
+                        sx = (dx * original_width) // scaled_width
+                        
+                        # Copy pixel from source
+                        i = src_offset + (sx * 2)
+                        line_buf[dx*2] = data[i]
+                        line_buf[dx*2 + 1] = data[i + 1]
+                    
+                    # Repeat the scaled line vertically scale times
                     for dy in range(scale):
-                        # Set window for this scaled line
                         tft._setwindowloc(
                             (x, y + sy*scale + dy),
                             (x + scaled_width - 1, y + sy*scale + dy)
                         )
-                        
-                        # Write scaled line one pixel at a time
-                        for dx in range(scaled_width):
-                            # Map x coordinate back to source
-                            sx = (dx * original_width) // scaled_width
-                            # Get pixel from source line
-                            pixel_data[0], pixel_data[1] = src_line[sx]
-                            tft._writedata(pixel_data)
+                        tft._writedata(line_buf)
+            
+            # Clean up memory
+            gc.collect()
                     
     except Exception as e:
         print("Error displaying image:", e)
