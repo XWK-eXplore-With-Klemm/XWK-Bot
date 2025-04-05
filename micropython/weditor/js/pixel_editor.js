@@ -23,67 +23,78 @@ function openPixelEditor() {
         border-radius: 8px;
         color: white;
         font-family: 'Arial', sans-serif;
+        position: relative;
     `;
     
     content.innerHTML = `
+        <div style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 10px;
+        " id="pixel-close">X</div>
         <div style="display: flex; gap: 20px; align-items: start;">
             <div>
-                <div style="margin-bottom: 10px; font-size: 14px;">32x32 Pixel Editor</div>
-                <canvas id="pixel-canvas" width="32" height="32" style="
+                <div style="margin-bottom: 10px; font-size: 18px; font-weight: bold;">PIXEL-PAINTER</div>
+                <canvas id="pixel-canvas" width="16" height="16" style="
                     border: 2px solid #333;
                     image-rendering: pixelated;
-                    width: 320px;
-                    height: 320px;
-                    background: white;
+                    width: 480px;
+                    height: 480px;
+                    background: black;
                 "></canvas>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="color" id="pixel-color" value="#000000" style="
-                    width: 100%;
-                    height: 40px;
-                    padding: 0;
-                    border: none;
-                    cursor: pointer;
-                ">
-                <button id="pixel-clear" style="
-                    padding: 8px 16px;
-                    margin: 4px;
-                    border: none;
-                    border-radius: 4px;
-                    background: #0000ff;
-                    color: black;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: background-color 0.2s ease;
-                ">CLEAR</button>
-                <button id="pixel-save" style="
-                    padding: 8px 16px;
-                    margin: 4px;
-                    border: none;
-                    border-radius: 4px;
-                    background: #00ff00;
-                    color: black;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: background-color 0.2s ease;
-                ">SAVE AS LOGO.BIN</button>
-                <button id="pixel-cancel" style="
-                    padding: 8px 16px;
-                    margin: 4px;
-                    border: none;
-                    border-radius: 4px;
-                    background: #ff0000;
-                    color: black;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: background-color 0.2s ease;
-                ">CANCEL</button>
+            <div style="display: flex; flex-direction: column; height: 520px; justify-content: space-between;">
+                <div style="margin-top: 34px;">
+                    <input type="color" id="pixel-color" value="#00ff00" style="
+                        width: 80px;
+                        height: 80px;
+                        padding: 0;
+                        border: none;
+                        cursor: pointer;
+                    ">
+                    <div style="
+                        color: white;
+                        text-align: left;
+                        margin-top: 2px;
+                        font-size: 14px;
+                    ">COLOR</div>
+                </div>
+                <div>
+                    <button id="pixel-save" style="
+                        padding: 8px 16px;
+                        margin: 4px;
+                        border: none;
+                        border-radius: 4px;
+                        background: #ffff00;
+                        color: black;
+                        font-family: 'Arial', sans-serif;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background-color 0.2s ease;
+                        width: 100%;
+                    ">SAVE</button>
+                    <button id="pixel-clear" style="
+                        padding: 8px 16px;
+                        margin: 4px;
+                        border: none;
+                        border-radius: 4px;
+                        background: #ff0000;
+                        color: black;
+                        font-family: 'Arial', sans-serif;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background-color 0.2s ease;
+                        width: 100%;
+                    ">CLEAR</button>
+
+                </div>
             </div>
         </div>
     `;
@@ -107,9 +118,12 @@ function openPixelEditor() {
     const ctx = canvas.getContext('2d');
     const colorPicker = document.getElementById('pixel-color');
     
-    // Fill with white initially
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 32, 32);
+    // Fill with black initially
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, 16, 16);
+    
+    // Set initial color to green
+    colorPicker.value = '#00ff00';
     
     let isDrawing = false;
     
@@ -117,14 +131,14 @@ function openPixelEditor() {
     function getPixelPos(e) {
         const rect = canvas.getBoundingClientRect();
         return {
-            x: Math.floor((e.clientX - rect.left) * 32 / rect.width),
-            y: Math.floor((e.clientY - rect.top) * 32 / rect.height)
+            x: Math.floor((e.clientX - rect.left) * 16 / rect.width),
+            y: Math.floor((e.clientY - rect.top) * 16 / rect.height)
         };
     }
     
     // Draw single pixel
     function drawPixel(x, y) {
-        if (x < 0 || x >= 32 || y < 0 || y >= 32) return;
+        if (x < 0 || x >= 16 || y < 0 || y >= 16) return;
         ctx.fillStyle = colorPicker.value;
         ctx.fillRect(x, y, 1, 1);
     }
@@ -147,31 +161,31 @@ function openPixelEditor() {
     
     // Clear button
     document.getElementById('pixel-clear').onclick = () => {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, 32, 32);
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 16, 16);
     };
     
-    // Cancel button
-    document.getElementById('pixel-cancel').onclick = () => {
+    // Close button
+    document.getElementById('pixel-close').onclick = () => {
         modal.remove();
     };
     
     // Save button
     document.getElementById('pixel-save').onclick = () => {
         // Ask for filename
-        const filename = prompt("Save as (without extension):", "logo");
+        const filename = prompt("Enter a name (use only letters, numbers and underscores):", "logo");
         if (!filename) return;  // User cancelled
         
         // Convert canvas to RGB565 binary
-        const imageData = ctx.getImageData(0, 0, 32, 32);
+        const imageData = ctx.getImageData(0, 0, 16, 16);
         const pixels = imageData.data;
-        const binary = new Uint8Array(4 + 32 * 32 * 2); // Header + pixel data
+        const binary = new Uint8Array(4 + 16 * 16 * 2); // Header + pixel data
         
-        // Write header (32x32, big-endian)
+        // Write header (16x16, big-endian)
         binary[0] = 0x00;
-        binary[1] = 0x20; // 32 in hex
+        binary[1] = 0x10; // 16 in hex
         binary[2] = 0x00;
-        binary[3] = 0x20; // 32 in hex
+        binary[3] = 0x10; // 16 in hex
         
         // Convert RGB888 to RGB565
         for (let i = 0; i < pixels.length; i += 4) {
