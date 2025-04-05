@@ -146,76 +146,90 @@ def reset_terminal():
     """Reset the terminal cursor position to top of screen"""
     tft.terminal_reset()  # Use TFT's terminal reset function
 
-def image(filepath, original_width, scale=1, x=None, y=None):
+def image(filepath, scale=1, x=None, y=None):
     """Display a raw RGB565 image file on the screen
     
     Args:
         filepath: Absolute path to the raw RGB565 image file
-        original_width: Width of the source image in pixels
         scale: Optional scaling factor (1 = original size)
         x: Optional x coordinate for top-left position (centers if None)
         y: Optional y coordinate for top-left position (centers if None)
-
-        bot.image("/lib/logo.bin", original_width=25, scale=2, x=10)
+        
+    File Format:
+        - Bytes 0-1: Width (16-bit unsigned integer, big-endian)
+        - Bytes 2-3: Height (16-bit unsigned integer, big-endian)
+        - Bytes 4+: RGB565 pixel data (2 bytes per pixel)
     """
     try:
-        # Get file size to determine height
-        import os
-        filesize = os.stat(filepath)[6]
-        
-        # Each pixel is 2 bytes in RGB565 format
-        total_pixels = filesize // 2
-        height = total_pixels // original_width
-        
-        # Calculate scaled dimensions
-        scaled_width = original_width * scale
-        scaled_height = height * scale
-        
-        # Use provided position or center if None
-        if x is None:
-            x = (tft._size[0] - scaled_width) // 2
-        if y is None:
-            y = (tft._size[1] - scaled_height) // 2
-        
-        # Read raw image data
+        # Open file once and keep it open for reading
         with open(filepath, 'rb') as f:
-            data = f.read()
-            
-        if scale == 1:
-            # Display directly at 1:1 scale
-            tft._setwindowloc((x, y), (x + original_width - 1, y + height - 1))
-            tft._writedata(data)
-        else:
-            # Pre-allocate scaled line buffer
-            line_buf = bytearray(scaled_width * 2)  # 2 bytes per pixel
-            
-            # Scale and display one line at a time to minimize memory usage
-            for sy in range(height):
-                # Get source line offset
-                src_offset = sy * original_width * 2
+            # Read header (4 bytes)
+            header = bytearray(4)
+            for i in range(4):
+                header[i] = ord(f.read(1))
                 
-                # Scale this line horizontally
-                for dx in range(scaled_width):
-                    # Map x coordinate back to source
-                    sx = (dx * original_width) // scaled_width
-                    
-                    # Copy pixel from source
-                    i = src_offset + (sx * 2)
-                    line_buf[dx*2] = data[i]
-                    line_buf[dx*2 + 1] = data[i + 1]
-                
-                # Repeat the scaled line vertically scale times
-                for dy in range(scale):
+            original_width = (header[0] << 8) | header[1]   # Big-endian 16-bit width
+            height = (header[2] << 8) | header[3]           # Big-endian 16-bit height
+            
+            # Verify reasonable dimensions
+            if original_width <= 0 or height <= 0 or original_width > 1000 or height > 1000:
+                raise ValueError(f"Invalid image dimensions: {original_width}x{height}")
+            
+            # Calculate scaled dimensions
+            scaled_width = original_width * scale
+            scaled_height = height * scale
+            
+            # Use provided position or center if None
+            if x is None:
+                x = (tft._size[0] - scaled_width) // 2
+            if y is None:
+                y = (tft._size[1] - scaled_height) // 2
+            
+            # Allocate a small buffer for one pixel (2 bytes)
+            pixel_data = bytearray(2)
+            
+            if scale == 1:
+                # Display directly at 1:1 scale, one line at a time
+                for sy in range(height):
+                    # Set window for this line
                     tft._setwindowloc(
-                        (x, y + sy*scale + dy),
-                        (x + scaled_width - 1, y + sy*scale + dy)
+                        (x, y + sy),
+                        (x + original_width - 1, y + sy)
                     )
-                    tft._writedata(line_buf)
+                    
+                    # Read and display one pixel at a time
+                    for sx in range(original_width):
+                        pixel_data[0] = ord(f.read(1))
+                        pixel_data[1] = ord(f.read(1))
+                        tft._writedata(pixel_data)
+            else:
+                # Scale and display one line at a time
+                for sy in range(height):
+                    # Read one source line into pixel array
+                    src_line = []  # Store just the pixel values
+                    for _ in range(original_width):
+                        pixel_data[0] = ord(f.read(1))
+                        pixel_data[1] = ord(f.read(1))
+                        src_line.append((pixel_data[0], pixel_data[1]))
+                    
+                    # Repeat this line scale times
+                    for dy in range(scale):
+                        # Set window for this scaled line
+                        tft._setwindowloc(
+                            (x, y + sy*scale + dy),
+                            (x + scaled_width - 1, y + sy*scale + dy)
+                        )
+                        
+                        # Write scaled line one pixel at a time
+                        for dx in range(scaled_width):
+                            # Map x coordinate back to source
+                            sx = (dx * original_width) // scaled_width
+                            # Get pixel from source line
+                            pixel_data[0], pixel_data[1] = src_line[sx]
+                            tft._writedata(pixel_data)
                     
     except Exception as e:
         print("Error displaying image:", e)
-        write("Image error:", color=RED)
-        write(str(e), color=RED)
 
 ### ULTRASONIC
 # Load ultrasonic pin configuration
