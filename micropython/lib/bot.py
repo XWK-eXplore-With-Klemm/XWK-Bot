@@ -164,8 +164,8 @@ def image(filepath, width, scale=1):
         height = total_pixels // width
         
         # Calculate scaled dimensions
-        scaled_width = int(width * scale)
-        scaled_height = int(height * scale)
+        scaled_width = width * scale
+        scaled_height = height * scale
         
         # Calculate centered position
         x = (tft._size[0] - scaled_width) // 2
@@ -180,19 +180,31 @@ def image(filepath, width, scale=1):
             tft._setwindowloc((x, y), (x + width - 1, y + height - 1))
             tft._writedata(data)
         else:
-            # Scale the image
-            for dy in range(scaled_height):
+            # Pre-allocate scaled line buffer
+            line_buf = bytearray(scaled_width * 2)  # 2 bytes per pixel
+            
+            # Scale and display one line at a time to minimize memory usage
+            for sy in range(height):
+                # Get source line offset
+                src_offset = sy * width * 2
+                
+                # Scale this line horizontally
                 for dx in range(scaled_width):
-                    # Map scaled coordinates back to original image
-                    sx = int(dx / scale)
-                    sy = int(dy / scale)
+                    # Map x coordinate back to source
+                    sx = (dx * width) // scaled_width
                     
-                    # Get original pixel from raw data
-                    i = 2 * (sy * width + sx)
-                    color = (data[i] << 8) | data[i+1]
-                    
-                    # Draw scaled pixel
-                    tft.pixel((x + dx, y + dy), color)
+                    # Copy pixel from source
+                    i = src_offset + (sx * 2)
+                    line_buf[dx*2] = data[i]
+                    line_buf[dx*2 + 1] = data[i + 1]
+                
+                # Repeat the scaled line vertically scale times
+                for dy in range(scale):
+                    tft._setwindowloc(
+                        (x, y + sy*scale + dy),
+                        (x + scaled_width - 1, y + sy*scale + dy)
+                    )
+                    tft._writedata(line_buf)
                     
     except Exception as e:
         print("Error displaying image:", e)
