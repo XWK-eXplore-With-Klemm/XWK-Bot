@@ -606,17 +606,24 @@ def network_setup():
         if not wlan.isconnected():
             write("Connecting to WiFi", color=WHITE)
             write(f"{ssid}", color=CYAN)
+            write("Press A to abort", color=GREY)
             wlan.connect(ssid, password)
 
-            # Try to connect to WLAN for 8 seconds
+            # Try to connect to WLAN
             start_time = time.time()
             #dots = 0
-            while not wlan.isconnected() and time.time() - start_time < 8:
+            while not wlan.isconnected() and time.time() - start_time < 30:
+                # Check for abort button
+                if is_pressed(BUTTON_A):
+                    wlan.disconnect()
+                    sleep(1)
+                    break
+                    
                 # Show loading animation
                 #write("." if dots == 0 else "", color=CYAN)
                 #write(".", color=GREY)
                 #dots = (dots + 1) % 3
-                time.sleep(1)
+                sleep(.2)
 
             #tft.fill(BLACK)  # Clear the loading animation
 
@@ -654,8 +661,8 @@ def network_setup():
             return True
         else:
             print("")
-            print("WiFi connection failed")
-            write("WiFi connection failed", color=YELLOW)
+            print("WiFi not connected")
+            write("WiFi not connected", color=YELLOW)
             print("Starting AP mode")
             write("Starting AP mode")
             sleep(1)
