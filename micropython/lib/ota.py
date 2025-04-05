@@ -4,10 +4,11 @@ import urequests
 import os
 from ini_parser import IniParser
 
-# Manual Execution:
-#from lib.ota import OTAUpdater
-#updater = OTAUpdater()
-#updater.update_all()
+""" Manual Execution:
+from lib.ota import OTAUpdater
+updater = OTAUpdater()
+updater.update_all()
+"""
 
 
 
@@ -59,9 +60,9 @@ class OTAUpdater:
                 response.close()
                 return False
                 
-            # content = response.text
-            # print(f"Response content length: {len(content)}")
-            # print(f"First 100 chars: {content[:100]}")
+            content = response.text
+            #print(f"Response content length: {len(content)}")
+            #print(f"First 100 chars: {content[:100]}")
             
             self.filelist = ujson.loads(content)
             response.close()
@@ -98,21 +99,20 @@ class OTAUpdater:
         except OSError:
             local_size = 0
             
-        print(f"\nChecking {rel_path}:")
-        print(f"  Remote size: {remote_size}, Local size: {local_size}")
+        print(f"Checking {rel_path}:", end='')
         
         # If sizes match, check hash
         if local_size == remote_size:
             local_hash = self.get_file_hash(local_path)
             if local_hash == remote_hash:
-                print("  File is up to date")
+                print(" unchanged")
                 return True
                 
         # Download and update file
         try:
-            print("  Downloading new version...")
+            print(f"\n  Remote size: {remote_size}, Local size: {local_size}")
             url = f"{self.base_url}/{rel_path}"
-            print(f"  Download URL: {url}")
+            print(f"  Downloading {url}")
             
             # Add headers to help with some servers
             headers = {
@@ -121,7 +121,6 @@ class OTAUpdater:
             }
             
             response = urequests.get(url, headers=headers)
-            print(f"  Response status: {response.status_code}")
             if response.status_code != 200:
                 print(f"  Error: HTTP {response.status_code}")
                 response.close()
@@ -132,7 +131,6 @@ class OTAUpdater:
                 f.write(response.content)
             response.close()
             
-            print("  File updated successfully")
             return True
         except Exception as e:
             print(f"  Error updating file:", e)
