@@ -93,24 +93,22 @@ class OTAUpdater:
         """Update a single file if needed"""
         local_path = f"/{rel_path}"
         
-        # Check if file exists
-        try:
-            local_size = os.stat(local_path)[6]
-        except OSError:
-            local_size = 0
-            
-        print(f"Checking {rel_path}:", end='')
+        print(f"Checking {rel_path}: ", end='')
         
-        # If sizes match, check hash
-        if local_size == remote_size:
+        # Check if file exists and compare hash
+        try:
             local_hash = self.get_file_hash(local_path)
             if local_hash == remote_hash:
-                print(" unchanged")
+                print("unchanged")
                 return True
+            else:
+                print(f"\n  Remote hash: {remote_hash}, Local hash: {local_hash}")
+        except OSError:
+            # File doesn't exist, will be downloaded
+            pass
                 
         # Download and update file
         try:
-            print(f"\n  Remote size: {remote_size}, Local size: {local_size}")
             url = f"{self.base_url}/{rel_path}"
             print(f"  Downloading {url}")
             
