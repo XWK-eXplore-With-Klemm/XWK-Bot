@@ -146,13 +146,17 @@ def reset_terminal():
     """Reset the terminal cursor position to top of screen"""
     tft.terminal_reset()  # Use TFT's terminal reset function
 
-def image(filepath, width, scale=1):
-    """Display a raw RGB565 image file centered on the screen
+def image(filepath, original_width, scale=1, x=None, y=None):
+    """Display a raw RGB565 image file on the screen
     
     Args:
         filepath: Absolute path to the raw RGB565 image file
-        width: Width of the image in pixels
+        original_width: Width of the source image in pixels
         scale: Optional scaling factor (1 = original size)
+        x: Optional x coordinate for top-left position (centers if None)
+        y: Optional y coordinate for top-left position (centers if None)
+
+        bot.image("/lib/logo.bin", original_width=25, scale=2, x=10)
     """
     try:
         # Get file size to determine height
@@ -161,15 +165,17 @@ def image(filepath, width, scale=1):
         
         # Each pixel is 2 bytes in RGB565 format
         total_pixels = filesize // 2
-        height = total_pixels // width
+        height = total_pixels // original_width
         
         # Calculate scaled dimensions
-        scaled_width = width * scale
+        scaled_width = original_width * scale
         scaled_height = height * scale
         
-        # Calculate centered position
-        x = (tft._size[0] - scaled_width) // 2
-        y = (tft._size[1] - scaled_height) // 2
+        # Use provided position or center if None
+        if x is None:
+            x = (tft._size[0] - scaled_width) // 2
+        if y is None:
+            y = (tft._size[1] - scaled_height) // 2
         
         # Read raw image data
         with open(filepath, 'rb') as f:
@@ -177,7 +183,7 @@ def image(filepath, width, scale=1):
             
         if scale == 1:
             # Display directly at 1:1 scale
-            tft._setwindowloc((x, y), (x + width - 1, y + height - 1))
+            tft._setwindowloc((x, y), (x + original_width - 1, y + height - 1))
             tft._writedata(data)
         else:
             # Pre-allocate scaled line buffer
@@ -186,12 +192,12 @@ def image(filepath, width, scale=1):
             # Scale and display one line at a time to minimize memory usage
             for sy in range(height):
                 # Get source line offset
-                src_offset = sy * width * 2
+                src_offset = sy * original_width * 2
                 
                 # Scale this line horizontally
                 for dx in range(scaled_width):
                     # Map x coordinate back to source
-                    sx = (dx * width) // scaled_width
+                    sx = (dx * original_width) // scaled_width
                     
                     # Copy pixel from source
                     i = src_offset + (sx * 2)
