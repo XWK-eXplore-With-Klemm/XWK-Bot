@@ -2,6 +2,7 @@ import ujson
 import uhashlib
 import urequests
 import os
+import gc
 from ini_parser import IniParser
 
 """ Manual Execution:
@@ -128,6 +129,9 @@ class OTAUpdater:
             with open(local_path, 'wb') as f:
                 f.write(response.content)
             response.close()
+            
+            # Force garbage collection to free up memory
+            gc.collect()
             
             return True
         except Exception as e:
