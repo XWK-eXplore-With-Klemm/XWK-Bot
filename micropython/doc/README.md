@@ -20,9 +20,12 @@ For WeMos LOLIN D32 ESP32 WROOM 32
 
 # Command line tools (for AI)
 
+https://docs.micropython.org/en/latest/reference/mpremote.html
+
 Upload files:
 ```bash
 ampy --port /dev/ttyUSB0 put lib/bot.py /lib/bot.py
+mpremote cp micropython/lib/ota.py :/lib/
 ```
 
 Reset ESP32:

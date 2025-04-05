@@ -1,2 +1,4 @@
+config.local.ini
+
 # Ignore production binary files
 production/*.bin 

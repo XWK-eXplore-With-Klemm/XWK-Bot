@@ -125,6 +125,19 @@ class OTAUpdater:
                 response.close()
                 return False
                 
+            # Create all parent directories recursively
+            dir_path = '/'.join(local_path.split('/')[:-1])
+            if dir_path:
+                current_dir = ''
+                for part in dir_path.split('/'):
+                    if part:
+                        current_dir = f"{current_dir}/{part}" if current_dir else f"/{part}"
+                        try:
+                            os.mkdir(current_dir)
+                        except OSError:
+                            # Directory might already exist
+                            pass
+                
             # Save file
             with open(local_path, 'wb') as f:
                 f.write(response.content)
