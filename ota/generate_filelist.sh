@@ -8,9 +8,10 @@ BLACKLIST=(
     "config.ini"                # Don't overwrite user WiFi credentials
     "config_proto_white.ini"    # Only for prototype
     # Example programs:
-    "line_follower.py"
+    "linefollower.py"
     "uss_bot.py"
     "uss_write.py"
+    ".cursorrules"
 )
 
 # Create file list in JSON format

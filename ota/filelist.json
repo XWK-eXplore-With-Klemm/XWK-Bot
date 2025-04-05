@@ -73,8 +73,8 @@
             "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
         "lib/ota.py": {
-            "size": 5144,
-            "hash": "6a7091d9099d3b45d538df66b4ff2213"
+            "size": 5309,
+            "hash": "0ad6d88599e79a4a2429732452d1623a"
         },
         "lib/hcsr04.py": {
             "size": 3400,
@@ -95,10 +95,6 @@
         "lib/VL53L0X.py": {
             "size": 9214,
             "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
-        },
-        "linefollower.py": {
-            "size": 765,
-            "hash": "04503420a82c61667383df67ca32841f"
         },
         "boot.py": {
             "size": 229,
