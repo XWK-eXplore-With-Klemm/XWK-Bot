@@ -49,8 +49,8 @@
             "hash": "dc21618ef6bd888b2ea68a4b19713304"
         },
         "doc/README.md": {
-            "size": 853,
-            "hash": "4582b8b7da96448f7fb961ea953cd486"
+            "size": 959,
+            "hash": "e12752759212e453691126c6dce594d9"
         },
         "lib/ini_parser.py": {
             "size": 2519,
@@ -73,8 +73,8 @@
             "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
         "lib/ota.py": {
-            "size": 5309,
-            "hash": "0ad6d88599e79a4a2429732452d1623a"
+            "size": 6171,
+            "hash": "5529ecaf0ccda46ad3e97fe4add543e8"
         },
         "lib/hcsr04.py": {
             "size": 3400,
@@ -85,8 +85,8 @@
             "hash": "2b3a30076e982ecf1c6f3da8e3519426"
         },
         "lib/bot.py": {
-            "size": 27067,
-            "hash": "4b60d6caf2bf0fd7b214550fca7c9797"
+            "size": 26285,
+            "hash": "f0c2d027df40c732426a37241f2ecd8c"
         },
         "lib/menu.py": {
             "size": 5453,

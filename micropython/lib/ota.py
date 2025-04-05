@@ -138,9 +138,16 @@ class OTAUpdater:
                             # Directory might already exist
                             pass
                 
-            # Save file
+            # Save file in chunks
+            CHUNK_SIZE = 1024  # 1KB chunks
             with open(local_path, 'wb') as f:
-                f.write(response.content)
+                while True:
+                    chunk = response.raw.read(CHUNK_SIZE)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    gc.collect()  # Force garbage collection after each chunk
+            
             response.close()
             
             # Force garbage collection to free up memory
