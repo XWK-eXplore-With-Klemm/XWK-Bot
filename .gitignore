@@ -1,0 +1,2 @@
+# Ignore production binary files
+production/*.bin 
