@@ -9,6 +9,7 @@ from sysfont import sysfont
 import hcsr04 # ultra sound HC-SR04 sensor
 import os
 from ini_parser import IniParser
+from math import sqrt
 
 ### CONFIG HANDLING
 # Make sure we use absolute path for config file
@@ -144,6 +145,59 @@ def write(*args, **kwargs):
 def reset_terminal():
     """Reset the terminal cursor position to top of screen"""
     tft.terminal_reset()  # Use TFT's terminal reset function
+
+def image(filepath, width, scale=1):
+    """Display a raw RGB565 image file centered on the screen
+    
+    Args:
+        filepath: Absolute path to the raw RGB565 image file
+        width: Width of the image in pixels
+        scale: Optional scaling factor (1 = original size)
+    """
+    try:
+        # Get file size to determine height
+        import os
+        filesize = os.stat(filepath)[6]
+        
+        # Each pixel is 2 bytes in RGB565 format
+        total_pixels = filesize // 2
+        height = total_pixels // width
+        
+        # Calculate scaled dimensions
+        scaled_width = int(width * scale)
+        scaled_height = int(height * scale)
+        
+        # Calculate centered position
+        x = (tft._size[0] - scaled_width) // 2
+        y = (tft._size[1] - scaled_height) // 2
+        
+        # Read raw image data
+        with open(filepath, 'rb') as f:
+            data = f.read()
+            
+        if scale == 1:
+            # Display directly at 1:1 scale
+            tft._setwindowloc((x, y), (x + width - 1, y + height - 1))
+            tft._writedata(data)
+        else:
+            # Scale the image
+            for dy in range(scaled_height):
+                for dx in range(scaled_width):
+                    # Map scaled coordinates back to original image
+                    sx = int(dx / scale)
+                    sy = int(dy / scale)
+                    
+                    # Get original pixel from raw data
+                    i = 2 * (sy * width + sx)
+                    color = (data[i] << 8) | data[i+1]
+                    
+                    # Draw scaled pixel
+                    tft.pixel((x + dx, y + dy), color)
+                    
+    except Exception as e:
+        print("Error displaying image:", e)
+        write("Image error:", color=RED)
+        write(str(e), color=RED)
 
 ### ULTRASONIC
 # Load ultrasonic pin configuration
