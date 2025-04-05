@@ -33,7 +33,7 @@ class OTAUpdater:
                 print("Error: OTA_BASE_URL not configured")
                 return False
             print(f"OTA_FILELIST URL: {self.filelist_url}")
-            print(f"Base URL for files: {self.base_url}")
+            print(f"OTA_BASE_URL: {self.base_url}")
             return True
         except Exception as e:
             print("Error loading config:", e)
@@ -42,8 +42,7 @@ class OTAUpdater:
     def get_filelist(self):
         """Download and parse filelist.json"""
         try:
-            print("Downloading filelist...")
-            print(f"URL: {self.filelist_url}")
+            print(f"Downloading filelist from URL: {self.filelist_url}")
             
             # Add headers to help with some servers
             headers = {
@@ -53,16 +52,16 @@ class OTAUpdater:
             
             response = urequests.get(self.filelist_url, headers=headers)
             print(f"Response status: {response.status_code}")
-            print(f"Response headers: {response.headers}")
+            #print(f"Response headers: {response.headers}")
             
             if response.status_code != 200:
                 print(f"Error: HTTP {response.status_code}")
                 response.close()
                 return False
                 
-            content = response.text
-            print(f"Response content length: {len(content)}")
-            print(f"First 100 chars: {content[:100]}")
+            # content = response.text
+            # print(f"Response content length: {len(content)}")
+            # print(f"First 100 chars: {content[:100]}")
             
             self.filelist = ujson.loads(content)
             response.close()

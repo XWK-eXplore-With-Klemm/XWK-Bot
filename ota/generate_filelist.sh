@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to generate a JSON file list with file sizes and MD5 hashes
+# Script to generate a JSON file list with file sizes and MD5 hashes for OTA update
 # Usage: ./ota/generate_filelist.sh
 
 # Files to exclude from OTA update
