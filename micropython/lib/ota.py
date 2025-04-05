@@ -153,4 +153,6 @@ class OTAUpdater:
             if not self.update_file(rel_path, file_info['size'], file_info['hash']):
                 success = False
                 
+        if success:
+            print("Update successful!")
         return success 
