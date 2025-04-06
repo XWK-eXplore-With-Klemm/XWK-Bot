@@ -58,7 +58,7 @@ class Iniconf:
     def debug(cls, *args, **kwargs):
         """Print debug messages if debug is enabled"""
         if cls._debug:
-            print('[IniConf]', *args, **kwargs)
+            print('[Iniconf]', *args, **kwargs)
     
     def __new__(cls, debug=False):
         """
