@@ -1,5 +1,13 @@
 {
     "files": {
+        "main.py": {
+            "size": 125,
+            "hash": "732e1d43792dea8202fb29a8f4c02f14"
+        },
+        "pymakr.conf": {
+            "size": 163,
+            "hash": "00aa20ee103a76d5343fbedc336655ce"
+        },
         "weditor/xwk-logo.png": {
             "size": 3399,
             "hash": "656c62f8662dd679efd33b72c152272a"
@@ -56,10 +64,6 @@
             "size": 304,
             "hash": "4eeecf1ce6267842ede94104d2212ff1"
         },
-        "lib/ini_parser.py": {
-            "size": 2519,
-            "hash": "b47ac690a8e64d875c598b18ed37bb56"
-        },
         "lib/ST7735.py": {
             "size": 31245,
             "hash": "c707a3076badc52141986dfd904c5f55"
@@ -67,14 +71,6 @@
         "lib/sysfont.py": {
             "size": 8395,
             "hash": "59f6aa16bfabfa06e3c21abebeb27b34"
-        },
-        "lib/xwk_json.py": {
-            "size": 3301,
-            "hash": "f551d3c3dd0327a1d38fe0c1ba892964"
-        },
-        "lib/selftest.py": {
-            "size": 820,
-            "hash": "aec89bf4ed8f0d551825425521adcedd"
         },
         "lib/ota.py": {
             "size": 6171,
@@ -84,13 +80,17 @@
             "size": 3400,
             "hash": "f924b0080583386cc66ae9336e1268d4"
         },
+        "lib/iniconf.py": {
+            "size": 9099,
+            "hash": "da4ae5d1775dc90a58317d3290e591cf"
+        },
         "lib/microWebSrv.py": {
             "size": 34127,
             "hash": "2b3a30076e982ecf1c6f3da8e3519426"
         },
         "lib/bot.py": {
-            "size": 29658,
-            "hash": "9f6353769dec8526ad36cc1d90e098a2"
+            "size": 27588,
+            "hash": "a32ada28654198794726b1bd56f25acd"
         },
         "lib/menu.py": {
             "size": 5453,
