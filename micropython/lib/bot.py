@@ -8,78 +8,20 @@ from ST7735 import TFT, TFTColor # GMT-177-01 128x160px TFTST7735 display
 from sysfont import sysfont
 import hcsr04 # ultra sound HC-SR04 sensor
 import os
-from ini_parser import IniParser
+from iniconf import Iniconf
 from math import sqrt
 
 ### CONFIG HANDLING
-# Make sure we use absolute path for config file
-CONFIG_FILE = '/config.ini'  # Root directory of the filesystem
-_config_parser = IniParser()
-CONFIG_FILE_CONTENT_CACHE = None
-
-def config_get(key, default=None):
-    """Get a config value by key"""
-    try:
-        global CONFIG_FILE_CONTENT_CACHE
-        
-        # Load config file if not cached
-        try:
-            if CONFIG_FILE_CONTENT_CACHE is None:
-                type="from file"
-                with open(CONFIG_FILE, 'r') as f:
-                    CONFIG_FILE_CONTENT_CACHE = f.read()
-                    _config_parser.loads(CONFIG_FILE_CONTENT_CACHE)
-            else:
-                type="from cache"
-                _config_parser.loads(CONFIG_FILE_CONTENT_CACHE)
-                
-            value = _config_parser.get(key, default)    
-            #print("config_get()", CONFIG_FILE, type, key, value)
-                
-            return value
-            
-        except Exception as e:
-            print("Error loading config", CONFIG_FILE, key, e)
-            return default
-            
-    except Exception as e:
-        print("config_get() error", CONFIG_FILE, key, e)
-        return default
-
-def config_set(key, value):
-    """Set a config value by key"""
-    try:
-        # Load existing config or create new
-        try:
-            with open(CONFIG_FILE, 'r') as f:
-                _config_parser.loads(f.read())
-        except Exception as e:
-            print("No config file found, creating new one", CONFIG_FILE, key, value, e)
-            
-        # Set the value
-        _config_parser.set(key, str(value))
-        
-        # Save back to file
-        with open(CONFIG_FILE, 'w') as f:
-            f.write(_config_parser.dumps())
-            #print("config_set()", CONFIG_FILE, key, value)
-            
-        # Update cache after successful save
-        global CONFIG_FILE_CONTENT_CACHE
-        CONFIG_FILE_CONTENT_CACHE = _config_parser.dumps()
-            
-        return True
-    except Exception as e:
-        print("config_set() error", CONFIG_FILE, key, value, e)
-        return False
+# Initialize config manager
+config = Iniconf()
 
 ### DISPLAY
 # Load display pin configuration
-SCK_PIN = config_get('SCK_PIN')
-SDA_PIN = config_get('SDA_PIN')
-DC_PIN = config_get('DC_PIN')
-RESET_PIN = config_get('RESET_PIN')
-CS_PIN = config_get('CS_PIN')
+SCK_PIN = config.get('SCK_PIN')
+SDA_PIN = config.get('SDA_PIN')
+DC_PIN = config.get('DC_PIN')
+RESET_PIN = config.get('RESET_PIN')
+CS_PIN = config.get('CS_PIN')
 
 spi = SPI(1, baudrate=60000000, polarity=0, phase=0, miso=None) # Using default SPI pins from >>> print(machine.SPI(1))
 
@@ -227,8 +169,8 @@ def image(filepath, scale=5, x=None, y=None):
 
 ### ULTRASONIC
 # Load ultrasonic pin configuration
-TRIGGER_PIN = config_get('TRIGGER_PIN')
-ECHO_PIN = config_get('ECHO_PIN')
+TRIGGER_PIN = config.get('TRIGGER_PIN')
+ECHO_PIN = config.get('ECHO_PIN')
 
 trigger_pin = machine.Pin(TRIGGER_PIN)
 echo_pin = machine.Pin(ECHO_PIN)
@@ -319,14 +261,14 @@ def battery_voltage_warning():
 # Motor alignment adjustment (-100 to +100)
 # Negative values slow down left motor
 # Positive values slow down right motor
-MOTOR_ALIGNMENT = config_get('MOTOR_ALIGNMENT', default=0)
+MOTOR_ALIGNMENT = config.get('MOTOR_ALIGNMENT', default=0)
 
 # Motor A Control Pins
 # Do not use pins 15,2,0,4 -> 15 and 0 are 3.3V at boot!
-MOTOR_LEFT_FORWARD_PIN = config_get('LEFT_FORWARD_PIN')
-MOTOR_LEFT_BACKWARD_PIN = config_get('LEFT_BACKWARD_PIN')
-MOTOR_RIGHT_FORWARD_PIN = config_get('RIGHT_FORWARD_PIN')
-MOTOR_RIGHT_BACKWARD_PIN = config_get('RIGHT_BACKWARD_PIN')
+MOTOR_LEFT_FORWARD_PIN = config.get('LEFT_FORWARD_PIN')
+MOTOR_LEFT_BACKWARD_PIN = config.get('LEFT_BACKWARD_PIN')
+MOTOR_RIGHT_FORWARD_PIN = config.get('RIGHT_FORWARD_PIN')
+MOTOR_RIGHT_BACKWARD_PIN = config.get('RIGHT_BACKWARD_PIN')
 
 # Initialize motor PWM pins
 INT1_A = PWM(Pin(MOTOR_LEFT_FORWARD_PIN))
@@ -398,11 +340,9 @@ def motor_alignment(speed=15):
     write(f"Alignment: {MOTOR_ALIGNMENT:+3d}", color=YELLOW)
     
     # Save alignment to config
-    if config_set('MOTOR_ALIGNMENT', MOTOR_ALIGNMENT):
-        write("Saved in config.ini", color=GREEN)
-    else:
-        write("Error saving config", color=RED)
-    
+    config.set('MOTOR_ALIGNMENT', MOTOR_ALIGNMENT)
+    config.save()
+    write("Saved in config.ini", color=GREEN)
     sleep(1)
 
 def motor(direction_left, speed_left, direction_right, speed_right):
@@ -558,9 +498,9 @@ def sweep():
 
 ### RGB LED
 # Load RGB LED pin configuration
-RGB_RED_PIN = config_get('RED_PIN')
-RGB_GREEN_PIN = config_get('GREEN_PIN')
-RGB_BLUE_PIN = config_get('BLUE_PIN')
+RGB_RED_PIN = config.get('RED_PIN')
+RGB_GREEN_PIN = config.get('GREEN_PIN')
+RGB_BLUE_PIN = config.get('BLUE_PIN')
 
 # Initialize RGB LED PWM pins
 rgb_led_red = PWM(Pin(RGB_RED_PIN), freq=1000)
@@ -605,8 +545,8 @@ def visualize_value(value):
 
 ### INFRARED SENSORS
 # Load IR sensor pin configuration
-IR_LEFT_PIN = config_get('IR_LEFT_PIN')
-IR_RIGHT_PIN = config_get('IR_RIGHT_PIN')
+IR_LEFT_PIN = config.get('IR_LEFT_PIN')
+IR_RIGHT_PIN = config.get('IR_RIGHT_PIN')
 
 infrared_left_pin = Pin(IR_LEFT_PIN, Pin.IN)
 infrared_right_pin = Pin(IR_RIGHT_PIN, Pin.IN)
@@ -650,11 +590,11 @@ def sleep(quantity, unit = "s"):
 from machine import Pin
 
 # Load button pin configuration
-BUTTON_UP = Pin(config_get('UP_PIN'), Pin.IN, Pin.PULL_UP)
-BUTTON_DOWN = Pin(config_get('DOWN_PIN'), Pin.IN, Pin.PULL_UP)
-BUTTON_LEFT = Pin(config_get('LEFT_PIN'), Pin.IN, Pin.PULL_UP)
-BUTTON_RIGHT = Pin(config_get('RIGHT_PIN'), Pin.IN, Pin.PULL_UP)
-BUTTON_A = Pin(config_get('A_PIN'), Pin.IN, Pin.PULL_UP)
+BUTTON_UP = Pin(config.get('UP_PIN'), Pin.IN, Pin.PULL_UP)
+BUTTON_DOWN = Pin(config.get('DOWN_PIN'), Pin.IN, Pin.PULL_UP)
+BUTTON_LEFT = Pin(config.get('LEFT_PIN'), Pin.IN, Pin.PULL_UP)
+BUTTON_RIGHT = Pin(config.get('RIGHT_PIN'), Pin.IN, Pin.PULL_UP)
+BUTTON_A = Pin(config.get('A_PIN'), Pin.IN, Pin.PULL_UP)
 
 def is_pressed(button):
     return not button.value()  # Returns True if button is pressed (low)
@@ -667,8 +607,8 @@ def network_setup():
     import ubinascii
 
     # Try to load configuration
-    ssid = config_get('WLAN_SSID')
-    password = config_get('WLAN_PASSWORD')
+    ssid = config.get('WLAN_SSID')
+    password = config.get('WLAN_PASSWORD')
     
     if not ssid or not password:
         print("No valid WiFi configuration found - starting AP mode")
@@ -859,8 +799,9 @@ def start_ap_mode():
         write(f"Saving WiFi configuration: {ssid}", color=GREY)
         
         # Save to config.ini using our config functions
-        config_set('WLAN_SSID', ssid)
-        config_set('WLAN_PASSWORD', password)
+        config.set('WLAN_SSID', ssid)
+        config.set('WLAN_PASSWORD', password)
+        config.save()
         
         content = """
         <html><head>
