@@ -33,8 +33,8 @@ config.set('PORT', 8080)         # Numbers are automatically converted
 config.save()                    # Save to current config file
 config.save('backup.ini')        # Or save to a different file
 
-# Enable debug output
-DEBUG_INICONF = True
+# Give constructor parameter debug=True to enable debug output
+config = Iniconf(debug=True)
 """
 
 class Iniconf:
@@ -52,24 +52,29 @@ class Iniconf:
     _instance = None  # Stores the single Iniconf instance
     _items = []       # List of (key, value) tuples or comment strings
     config_file = '/config.ini'  # Default config file path
+    _debug = False    # Debug flag for the instance
     
     @classmethod
     def debug(cls, *args, **kwargs):
-        """Print debug messages if DEBUG_INICONF is True"""
-        if globals().get('DEBUG_INICONF', False):
-            print(*args, **kwargs)
+        """Print debug messages if debug is enabled"""
+        if cls._debug:
+            print('[IniConf]', *args, **kwargs)
     
-    def __new__(cls):
+    def __new__(cls, debug=False):
         """
         Override __new__ to implement the singleton pattern.
         This ensures only one Iniconf instance exists.
         
+        Args:
+            debug (bool): Enable debug output for this instance
+            
         Returns:
             Iniconf: The single instance of the Iniconf
         """
         if cls._instance is None:
             cls._instance = super(Iniconf, cls).__new__(cls)
             cls._instance._items = []
+            cls._debug = debug
             cls.debug("Created new Iniconf instance")
         return cls._instance
     
@@ -151,7 +156,7 @@ class Iniconf:
         if not self._items:
             self.debug("Loading config from", self.config_file)
             self.load(self.config_file)
-            
+
         for item in self._items:
             if isinstance(item, tuple):
                 k, v = item
