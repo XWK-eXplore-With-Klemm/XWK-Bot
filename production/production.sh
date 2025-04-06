@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-# Check for --skip-flash flag
-SKIP_FLASH=false
+# Check for --no-flash flag
+NO_FLASH=false
 for arg in "$@"; do
-    if [ "$arg" = "--skip-flash" ]; then
-        SKIP_FLASH=true
+    if [ "$arg" = "--no-flash" ]; then
+        NO_FLASH=true
         break
     fi
 done
@@ -14,7 +14,7 @@ done
 # Run from project root
 # These needs a valid wlan configuration in config.local.ini (WLAN_SSID, WLAN_PASSWORD)
 
-if [ "$SKIP_FLASH" = false ]; then
+if [ "$NO_FLASH" = false ]; then
     echo "If flashing fails, try reset button on the board and immediately start the script again!"
     echo 
 
