@@ -6,31 +6,35 @@ Memory usage: 2544 bytes for lib, 5232 bytes with 25 config items
 2025-04-06 by klemens@ull.at
 
 Usage:
-    # Use default /config.ini
-    from iniconf import Iniconf
-    config = Iniconf()
-    print(config.get('some_key'))  # Automatically loads /config.ini
 
-    # Or use a different file
-    config = Iniconf()
-    config.set_config_file('other.ini')  # Must be called before first get()
-    value = config.get('some_key')  # Loads from other.ini
+# Use default /config.ini
+from iniconf import Iniconf
+config = Iniconf()
+print(config.get('SOME_KEY'))  # Automatically loads /config.ini
 
-    # Use in different classes
-    class MyClass:
-        def __init__(self):
-            self.config = Iniconf()  # Gets the same instance
-            
-        def do_something(self):
-            value = self.config.get('some_key')
-            # Use the value...
+# Or use a different file
+config = Iniconf()
+config.set_config_file('other.ini')  # Must be called before first get()
+value = config.get('SOME_KEY')  # Loads from other.ini
 
-    # Setting values and saving
-    config = Iniconf()
-    config.set('host', 'localhost')  # Set a value
-    config.set('port', 8080)         # Numbers are automatically converted
-    config.save()                    # Save to current config file
-    config.save('backup.ini')        # Or save to a different file
+# Use in different classes
+class MyClass:
+    def __init__(self):
+        self.config = Iniconf()  # Gets the same instance
+        
+    def do_something(self):
+        value = self.config.get('SOME_KEY')
+        # Use the value...
+
+# Setting values and saving
+config = Iniconf()
+config.set('HOST', 'localhost')  # Set a value
+config.set('PORT', 8080)         # Numbers are automatically converted
+config.save()                    # Save to current config file
+config.save('backup.ini')        # Or save to a different file
+
+# Enable debug output
+DEBUG_INICONF = True
 """
 
 class Iniconf:
@@ -49,6 +53,12 @@ class Iniconf:
     _items = []       # List of (key, value) tuples or comment strings
     config_file = '/config.ini'  # Default config file path
     
+    @classmethod
+    def debug(cls, *args, **kwargs):
+        """Print debug messages if DEBUG_INICONF is True"""
+        if globals().get('DEBUG_INICONF', False):
+            print(*args, **kwargs)
+    
     def __new__(cls):
         """
         Override __new__ to implement the singleton pattern.
@@ -60,6 +70,7 @@ class Iniconf:
         if cls._instance is None:
             cls._instance = super(Iniconf, cls).__new__(cls)
             cls._instance._items = []
+            cls.debug("Created new Iniconf instance")
         return cls._instance
     
     def set_config_file(self, file_path):
@@ -76,6 +87,7 @@ class Iniconf:
         if self._items:
             raise RuntimeError("Configuration already loaded, cannot change file path")
         self.config_file = file_path
+        self.debug("Set config file to:", file_path)
     
     def loads(self, content):
         """
@@ -102,6 +114,7 @@ class Iniconf:
                 # Key-value pair
                 key, value = line.split('=', 1)
                 self._items.append((key.strip(), value.strip()))
+                self.debug("Loaded key-value pair:", key.strip(), "=", value.strip())
     
     def dumps(self):
         """
@@ -136,6 +149,7 @@ class Iniconf:
             The value for the key, or default if not found
         """
         if not self._items:
+            self.debug("Loading config from", self.config_file)
             self.load(self.config_file)
             
         for item in self._items:
@@ -144,9 +158,13 @@ class Iniconf:
                 if k == key:
                     # Try to convert to integer if possible
                     try:
-                        return int(v)
+                        value = int(v)
+                        self.debug("Got integer value for", key, ":", value)
+                        return value
                     except ValueError:
+                        self.debug("Got string value for", key, ":", v)
                         return v
+        self.debug("Key not found:", key, "using default:", default)
         return default
     
     def set(self, key, value):
@@ -163,10 +181,12 @@ class Iniconf:
                 k, _ = item
                 if k == key:
                     self._items[i] = (key, str(value))
+                    self.debug("Updated existing key:", key, "=", value)
                     return
                     
         # Key doesn't exist, append new one
         self._items.append((key, str(value)))
+        self.debug("Added new key:", key, "=", value)
     
     def load(self, file_path):
         """
@@ -179,10 +199,12 @@ class Iniconf:
             with open(file_path, 'r') as f:
                 content = f.read()
                 self.loads(content)
+                self.debug("Successfully loaded config from", file_path)
         except Exception as e:
             print(f"Error loading config: {e}")
             # Initialize with empty config if file can't be loaded
             self._items = []
+            self.debug("Initialized empty config due to error")
     
     def save(self, file_path=None):
         """
@@ -197,8 +219,12 @@ class Iniconf:
             with open(target_path, 'w') as f:
                 content = self.dumps()
                 f.write(content)
+                self.debug("Successfully saved config to", target_path)
         except Exception as e:
             print(f"Error saving config: {e}")
+            self.debug("Failed to save config to", target_path)
+
+    
 
 # Example usage:
 # The if __name__ == "__main__": block at the end of this file contains example code
