@@ -1,26 +1,37 @@
 #!/bin/bash
 set -e
 
+# Check for --skip-flash flag
+SKIP_FLASH=false
+for arg in "$@"; do
+    if [ "$arg" = "--skip-flash" ]; then
+        SKIP_FLASH=true
+        break
+    fi
+done
+
 # (Re-flash) the ESP32 board while using OTA update functionality with builtin features (blacklist...)
 # Run from project root
 # These needs a valid wlan configuration in config.local.ini (WLAN_SSID, WLAN_PASSWORD)
 
-echo "If flashing fails, try reset button on the board and immediately start the script again!"
-echo 
+if [ "$SKIP_FLASH" = false ]; then
+    echo "If flashing fails, try reset button on the board and immediately start the script again!"
+    echo 
 
-echo "Erasing flash"
-esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
-echo
+    echo "Erasing flash"
+    esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
+    echo
 
-echo "Flashing Micropython firmware"
-# Download latest version from https://micropython.org/download/ESP32_GENERIC/
-# mpremote reset --bootloader;
-esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash -z 0x1000 production/ESP32_GENERIC-20241129-v1.24.1.bin
-echo
+    echo "Flashing Micropython firmware"
+    # Download latest version from https://micropython.org/download/ESP32_GENERIC/
+    # mpremote reset --bootloader;
+    esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash -z 0x1000 production/ESP32_GENERIC-20241129-v1.24.1.bin
+    echo
 
-echo "Waiting 3 seconds for device to settle..."
-sleep 3
-echo
+    echo "Waiting 3 seconds for device to settle..."
+    sleep 3
+    echo
+fi
 
 #echo "Uploading XWK-Bot project files"
 #cd xkwbot-pcb-v1
