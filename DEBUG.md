@@ -47,7 +47,18 @@ print(sys.modules)                      # []
 print("Memory Free:", gc.mem_free())    # Memory Free: 153552
 ```
 
-# ASYNC
+# NON-BLOCKING / MULTITASKING
+
+## Timer
+
+```python
+def start(self):
+    """Start the menu with a timer"""
+    if self.timer is None:
+        bot.write("Press A to select program", color=bot.WHITE)
+        self.timer = Timer(1)  # Use timer 1
+        self.timer.init(period=100, mode=Timer.PERIODIC, callback=self.check)  # Check every 200ms
+```     
 
 ## Threads _thread
 
