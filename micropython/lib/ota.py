@@ -3,7 +3,7 @@ import uhashlib
 import urequests
 import os
 import gc
-from ini_parser import IniParser
+from iniconf import Iniconf
 
 """ Manual Execution:
 from lib.ota import OTAUpdater
@@ -11,11 +11,9 @@ updater = OTAUpdater()
 updater.update_all()
 """
 
-
-
 class OTAUpdater:
     def __init__(self):
-        self.config = IniParser()
+        self.config = Iniconf()
         self.filelist_url = None
         self.base_url = None
         self.filelist = None
@@ -23,17 +21,16 @@ class OTAUpdater:
     def load_config(self):
         """Load OTA configuration from config.ini"""
         try:
-            with open('/config.ini', 'r') as f:
-                self.config.loads(f.read())
             self.filelist_url = self.config.get('OTA_FILELIST')
             if not self.filelist_url:
                 print("Error: OTA_FILELIST not configured")
                 return False
-            # Get base URL from config
+            
             self.base_url = self.config.get('OTA_BASE_URL')
             if not self.base_url:
                 print("Error: OTA_BASE_URL not configured")
                 return False
+                
             print(f"OTA_FILELIST URL: {self.filelist_url}")
             print(f"OTA_BASE_URL: {self.base_url}")
             return True
@@ -46,7 +43,6 @@ class OTAUpdater:
         try:
             print(f"Downloading filelist from URL: {self.filelist_url}")
             
-            # Add headers to help with some servers
             headers = {
                 'User-Agent': 'XWK-Bot OTA Updater',
                 'Accept': 'application/json'
@@ -54,7 +50,6 @@ class OTAUpdater:
             
             response = urequests.get(self.filelist_url, headers=headers)
             print(f"Response status: {response.status_code}")
-            #print(f"Response headers: {response.headers}")
             
             if response.status_code != 200:
                 print(f"Error: HTTP {response.status_code}")
@@ -62,9 +57,6 @@ class OTAUpdater:
                 return False
                 
             content = response.text
-            #print(f"Response content length: {len(content)}")
-            #print(f"First 100 chars: {content[:100]}")
-            
             self.filelist = ujson.loads(content)
             response.close()
             print("Filelist downloaded successfully")
@@ -87,6 +79,9 @@ class OTAUpdater:
                     md5.update(chunk)
             return ''.join(['{:02x}'.format(b) for b in md5.digest()])
         except Exception as e:
+            # Only suppress ENOENT (file not found) error
+            if str(e) == "[Errno 2] ENOENT":
+                return None
             print(f"Error calculating hash for {filename}:", e)
             return None
             
@@ -96,24 +91,22 @@ class OTAUpdater:
         
         print(f"Checking {rel_path}: ", end='')
         
-        # Check if file exists and compare hash
         try:
             local_hash = self.get_file_hash(local_path)
             if local_hash == remote_hash:
                 print("unchanged")
                 return True
+            elif local_hash is None:
+                print("new file")
             else:
                 print(f"\n  Remote hash: {remote_hash}, Local hash: {local_hash}")
         except OSError:
-            # File doesn't exist, will be downloaded
-            pass
+            print("new file")
                 
-        # Download and update file
         try:
             url = f"{self.base_url}/{rel_path}"
             print(f"  Downloading {url}")
             
-            # Add headers to help with some servers
             headers = {
                 'User-Agent': 'XWK-Bot OTA Updater',
                 'Accept': '*/*'
@@ -125,7 +118,6 @@ class OTAUpdater:
                 response.close()
                 return False
                 
-            # Create all parent directories recursively
             dir_path = '/'.join(local_path.split('/')[:-1])
             if dir_path:
                 current_dir = ''
@@ -135,22 +127,18 @@ class OTAUpdater:
                         try:
                             os.mkdir(current_dir)
                         except OSError:
-                            # Directory might already exist
                             pass
                 
-            # Save file in chunks
-            CHUNK_SIZE = 1024  # 1KB chunks
+            CHUNK_SIZE = 1024
             with open(local_path, 'wb') as f:
                 while True:
                     chunk = response.raw.read(CHUNK_SIZE)
                     if not chunk:
                         break
                     f.write(chunk)
-                    gc.collect()  # Force garbage collection after each chunk
+                    gc.collect()
             
             response.close()
-            
-            # Force garbage collection to free up memory
             gc.collect()
             
             return True
@@ -175,4 +163,4 @@ class OTAUpdater:
                 
         if success:
             print("Update successful!")
-        return success 
+        return success

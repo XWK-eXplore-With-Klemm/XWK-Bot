@@ -49,7 +49,7 @@ sleep 2
 echo "Starting OTA update..."
 mpremote cp micropython/config.ini :/
 mpremote fs mkdir lib || true
-mpremote cp micropython/lib/ini_parser.py :/lib/
+mpremote cp micropython/lib/iniconf.py :/lib/
 mpremote cp micropython/lib/ota.py :/lib/
 mpremote exec "from lib.ota import OTAUpdater; updater = OTAUpdater(); updater.update_all()"
 

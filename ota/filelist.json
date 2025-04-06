@@ -1,9 +1,5 @@
 {
     "files": {
-        "main.py": {
-            "size": 125,
-            "hash": "732e1d43792dea8202fb29a8f4c02f14"
-        },
         "pymakr.conf": {
             "size": 163,
             "hash": "00aa20ee103a76d5343fbedc336655ce"
@@ -73,8 +69,8 @@
             "hash": "59f6aa16bfabfa06e3c21abebeb27b34"
         },
         "lib/ota.py": {
-            "size": 6171,
-            "hash": "5529ecaf0ccda46ad3e97fe4add543e8"
+            "size": 5564,
+            "hash": "ddbae5db335b6f721b6b02968ccebca4"
         },
         "lib/hcsr04.py": {
             "size": 3400,
