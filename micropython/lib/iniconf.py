@@ -2,6 +2,7 @@
 Iniconf - A complete INI configuration management solution for MicroPython.
 Provides singleton-based access to configuration values with file handling.
 This lib supports comments, and respects the location of items in the file.
+Memory usage: 2544 bytes for lib, 5232 bytes with 25 config items
 2025-04-06 by klemens@ull.at
 
 Usage:
