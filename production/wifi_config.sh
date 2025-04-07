@@ -23,16 +23,17 @@ echo "Configuring WiFi for SSID: $WLAN_SSID"
 
 # Configure WiFi settings in config.ini on the device using iniconf
 echo "Updating config.ini on device with WiFi settings..."
-mpremote exec "
+mpremote resume exec "
 from lib.iniconf import Iniconf
 config = Iniconf()
 config.set('WLAN_SSID', '$WLAN_SSID')
 config.set('WLAN_PASSWORD', '$WLAN_PASSWORD')
 config.save()
-import machine
-machine.soft_reset()
 "
 
 echo "WiFi configuration complete!"
-echo "You may need to reset the device for changes to take effect."
+echo "Resetting device..."
+mpremote resume reset           # resume prevents soft-reset of the device, otherwise the device would reset twice
+echo
+
 echo "Done!"

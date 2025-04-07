@@ -57,3 +57,10 @@ esptool.py --chip esp32 --port /dev/ttyUSB0 run
 
 # Web-IDE Projekt
 https://github.com/vsolina/micropython-web-editor/tree/development
+
+
+# mpremote
+
+https://docs.micropython.org/en/latest/reference/mpremote.html
+
+`resume` prevents soft-reset of the device. e.g. `mpremote resume fs ls`

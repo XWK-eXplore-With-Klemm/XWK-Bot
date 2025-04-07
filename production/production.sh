@@ -54,7 +54,8 @@ mpremote cp micropython/lib/ota.py :/lib/
 mpremote exec "from lib.ota import OTAUpdater; updater = OTAUpdater(); updater.update_all()"
 echo 
 
-echo "Reset your board now!"
+echo "Resetting device..."
+mpremote resume reset           # resume prevents soft-reset of the device, otherwise the device would reset twice
 echo
 
 echo Done!
