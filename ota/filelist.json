@@ -77,8 +77,8 @@
             "hash": "f924b0080583386cc66ae9336e1268d4"
         },
         "lib/iniconf.py": {
-            "size": 9099,
-            "hash": "da4ae5d1775dc90a58317d3290e591cf"
+            "size": 9232,
+            "hash": "c52623bbc10a7895d5dbf762916fad0f"
         },
         "lib/microWebSrv.py": {
             "size": 34127,
@@ -97,8 +97,8 @@
             "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
         },
         "boot.py": {
-            "size": 1021,
-            "hash": "103d2ade3c956c3d01842cc39a82e244"
+            "size": 1022,
+            "hash": "b0c018e92d2c76120decd289691e764a"
         }
     }
 }
