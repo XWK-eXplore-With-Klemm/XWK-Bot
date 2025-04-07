@@ -180,6 +180,10 @@ class Iniconf:
             key (str): The key to set
             value: The value to set
         """
+        if not self._items:
+            self.debug("Loading config from", self.config_file)
+            self.load(self.config_file)
+
         # Try to update existing key
         for i, item in enumerate(self._items):
             if isinstance(item, tuple):
