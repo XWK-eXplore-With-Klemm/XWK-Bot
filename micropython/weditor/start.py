@@ -4,6 +4,7 @@ import sys
 import network
 import gc
 from microWebSrv import MicroWebSrv
+import menu  
 
 
 DEBUG_PRINT = True
@@ -278,6 +279,10 @@ def run(httpClient, httpResponse):
         content = {"stopped": True}
     elif name:
         dprint("Starting process {}".format(name))
+        menu.stop()
+        dprint("Menu stopped")
+        import bot
+        bot.reset_terminal()
         import weditor.pmanager
         weditor.pmanager.restart_process(name)
         content = {"started": True}
