@@ -9,8 +9,8 @@
             "hash": "656c62f8662dd679efd33b72c152272a"
         },
         "weditor/start.py": {
-            "size": 17657,
-            "hash": "a354992f9fde0957737d0a4cf3160e27"
+            "size": 17387,
+            "hash": "2029cf184a94d5344b50a5e4f6b3bfff"
         },
         "weditor/index.html": {
             "size": 3296,
@@ -89,16 +89,20 @@
             "hash": "a32ada28654198794726b1bd56f25acd"
         },
         "lib/menu.py": {
-            "size": 5453,
-            "hash": "4a1ff3f9a5dc5d767aec1e79f4b163b9"
+            "size": 5496,
+            "hash": "71582b02848982695014014287215aec"
         },
         "lib/VL53L0X.py": {
             "size": 9214,
             "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
         },
+        "lib/ota_check.py": {
+            "size": 1987,
+            "hash": "28c429600571533a9f3a1fb8e92ad734"
+        },
         "boot.py": {
-            "size": 1022,
-            "hash": "b0c018e92d2c76120decd289691e764a"
+            "size": 1122,
+            "hash": "5e3d7a1153a7af81df2b02ca98f519b2"
         }
     }
 }

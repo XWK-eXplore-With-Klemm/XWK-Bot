@@ -480,29 +480,19 @@ def reset_device(httpClient, httpResponse):
 @MicroWebSrv.route('/ota/update', 'POST')
 def ota_update(httpClient, httpResponse):
     try:
-        # Start update in background
-        import _thread
-        def run_update():
-            from lib.ota import OTAUpdater
-            import machine
-            updater = OTAUpdater()
-            if updater.update_all():
-                print("OTA update completed successfully, resetting device...")
-                machine.reset()
-            else:
-                print("OTA update failed")
-            
-        _thread.start_new_thread(run_update, ())
-        
-        # Send response with update status
+        with open('ota_flag.txt', 'w') as f:
+            f.write('0')  # Initialize with 0 attempts
         httpResponse.WriteResponse(
             code=200,
             headers={"Access-Control-Allow-Origin": "*"},
             contentType="text/plain",
             contentCharset="UTF-8",
-            content="OTA update started. Device will reset when complete. Reload page to reconnect."
+            content="OTA update will run after reset. Please wait and then reload the page."
         )
-        
+        import time
+        time.sleep(0.5)  # Ensure response is sent
+        import machine
+        machine.reset()
     except Exception as e:
         import sys
         sys.print_exception(e)
@@ -511,7 +501,7 @@ def ota_update(httpClient, httpResponse):
             headers={"Access-Control-Allow-Origin": "*"},
             contentType="text/plain",
             contentCharset="UTF-8",
-            content=f"Error starting OTA update: {str(e)}"
+            content=f"Error scheduling OTA update: {str(e)}"
         )
 
 mws = MicroWebSrv(webPath="/weditor")

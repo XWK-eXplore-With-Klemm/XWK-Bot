@@ -1,4 +1,5 @@
 import os
+import gc
 import bot
 from machine import Timer
 
@@ -141,7 +142,9 @@ menu = MenuState()
 def start():
     """Start the menu - this is the main entry point"""
     menu.start()
+    gc.collect()
 
 def stop():
     """Stop the menu"""
     menu.stop()
+    gc.collect()
