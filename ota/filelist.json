@@ -1,9 +1,5 @@
 {
     "files": {
-        "pymakr.conf": {
-            "size": 163,
-            "hash": "00aa20ee103a76d5343fbedc336655ce"
-        },
         "weditor/xwk-logo.png": {
             "size": 3399,
             "hash": "656c62f8662dd679efd33b72c152272a"
@@ -13,8 +9,8 @@
             "hash": "2029cf184a94d5344b50a5e4f6b3bfff"
         },
         "weditor/index.html": {
-            "size": 3296,
-            "hash": "01aac748cfd74d5d102448bf166e181e"
+            "size": 3370,
+            "hash": "86b8fae1bffd8e5834fcd1d814aaa5a6"
         },
         "weditor/pmanager.py": {
             "size": 1550,
@@ -24,6 +20,14 @@
             "size": 4502,
             "hash": "c840a1c59036a21118c4f3cc656a4554"
         },
+        "weditor/js/ace.js": {
+            "size": 391751,
+            "hash": "c0f765ed216a5d8a7e0b9046b88573e7"
+        },
+        "weditor/js/mode-python.js": {
+            "size": 8244,
+            "hash": "466e10a83da400425f76d1d6f1983d4e"
+        },
         "weditor/js/webrepl.min.js": {
             "size": 5123,
             "hash": "c380c353ea1385bc77deb3655ddd382f"
@@ -32,9 +36,17 @@
             "size": 9112,
             "hash": "3f10107301f7a896f1e7d03ce8771bb8"
         },
+        "weditor/js/mode-plain_text.js": {
+            "size": 836,
+            "hash": "4ed18a2a02d20c377853c9cb41267d47"
+        },
         "weditor/js/script.js": {
             "size": 7429,
             "hash": "ba4d3ab63a23152656f95ff4f96f334a"
+        },
+        "weditor/js/theme-dracula.js": {
+            "size": 4821,
+            "hash": "2575028ba0785a1c56f506e7184f0bf8"
         },
         "weditor/js/term.min.js": {
             "size": 61494,
@@ -85,8 +97,8 @@
             "hash": "2b3a30076e982ecf1c6f3da8e3519426"
         },
         "lib/bot.py": {
-            "size": 27588,
-            "hash": "a32ada28654198794726b1bd56f25acd"
+            "size": 27627,
+            "hash": "7d023991d538d2d0faef50d4e880c80d"
         },
         "lib/menu.py": {
             "size": 5496,
