@@ -7,11 +7,13 @@
 BLACKLIST=(
     "config.ini"                # Don't overwrite user WiFi credentials
     "config_proto_white.ini"    # Only for prototype
-    # Example programs:
+    ".cursorrules"              # Cursor rules
+    "pymakr.conf"               # Pymakr config
+
+    # Example programs which the users should write themself:
     "linefollower.py"
     "uss_bot.py"
     "uss_write.py"
-    ".cursorrules"
 )
 
 # Create file list in JSON format
