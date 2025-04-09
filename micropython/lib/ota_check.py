@@ -30,6 +30,8 @@ def check_and_update():
     # Failsafe: abort after 3 attempts
     if attempt_count > 3:
         print("Failsafe triggered: OTA update failed after 3 attempts. Clearing flag and aborting.")
+        bot.write("OTA update failed 3 times", color=bot.RED)
+        bot.write("Try again in webbrowser", color=bot.GREY)
         try:
             os.remove('ota_flag.txt')
         except OSError as e:
@@ -41,6 +43,7 @@ def check_and_update():
         from lib.ota import OTAUpdater
         updater = OTAUpdater()
         bot.write("OTA update please wait...", color=bot.RED)
+        bot.write("If stuck please reset", color=bot.GREY)
         success = updater.update_all()
     except Exception as e:
         print(f"OTA update attempt {attempt_count} failed: {str(e)}")

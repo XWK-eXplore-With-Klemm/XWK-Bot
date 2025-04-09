@@ -97,8 +97,8 @@
             "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
         },
         "lib/ota_check.py": {
-            "size": 1987,
-            "hash": "28c429600571533a9f3a1fb8e92ad734"
+            "size": 2169,
+            "hash": "4cce6a21d5e25b3fa8da6b7733486b6c"
         },
         "boot.py": {
             "size": 1122,
