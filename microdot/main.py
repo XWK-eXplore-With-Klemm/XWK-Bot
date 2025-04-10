@@ -16,6 +16,7 @@ Template.initialize(template_dir='templates')
 def cleanup(request, response):
     print("after request: Garbage collection")
     gc.collect()
+    print("Memory after GC:", gc.mem_free())
     return response
 
 @app.route('/')

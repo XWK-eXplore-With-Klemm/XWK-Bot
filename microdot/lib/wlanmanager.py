@@ -7,8 +7,11 @@ import gc
 import network
 import time
 import ubinascii
+import machine
+import asyncio
 from iniconf import Iniconf
 from microdot import Response
+from lib.phew import dns
 
 class WLANManager:
     def __init__(self, app, project_name="MICRODOT", config_path="/config.ini"):
@@ -34,7 +37,9 @@ class WLANManager:
         @self.app.route('/library/test/success.html')  # iOS
         async def captive_portal_check(request):
             """Redirect all captive portal detection requests to the index page"""
-            return Response(body='', status_code=302, headers={'Location': f'http://{request.host}/'})
+            ap = network.WLAN(network.AP_IF)
+            ip = ap.ifconfig()[0]
+            return Response(body='', status_code=302, headers={'Location': f'http://{ip}/wifi-config'})
 
         @self.app.route('/connecttest.txt')  # Windows
         async def windows_connect_test(request):
@@ -44,9 +49,9 @@ class WLANManager:
         @self.app.route('/fwlink')  # Windows
         async def windows_redirect(request):
             """Redirect Windows captive portal requests"""
-            return Response.redirect('/')
+            return Response.redirect('/wifi-config')
 
-        @self.app.route('/wifi')
+        @self.app.route('/wifi-config')
         async def wifi_config(request):
             """Serve WiFi configuration page"""
             networks = self._scan_networks()
@@ -66,7 +71,7 @@ class WLANManager:
                 </style>
             </head><body>
                 <h1>{self.project_name} WiFi Setup</h1>
-                <form method="POST" action="/wifi">
+                <form method="POST" action="/wifi-config">
                     <select name="ssid" required>
                         <option value="">Select Network...</option>
                         {network_options}
@@ -77,7 +82,7 @@ class WLANManager:
             </body></html>
             """
 
-        @self.app.route('/wifi', methods=['POST'])
+        @self.app.route('/wifi-config', methods=['POST'])
         async def wifi_config_post(request):
             """Handle WiFi configuration form submission"""
             form = request.form
@@ -86,32 +91,47 @@ class WLANManager:
             
             if ssid and password:
                 print(f"Saving WiFi configuration: {ssid}")
-                self.config.set('WLAN_SSID', ssid)
-                self.config.set('WLAN_PASSWORD', password)
-                self.config.save()
-                
-                # Schedule restart
-                async def _restart():
-                    await asyncio.sleep(2)
-                    import machine
-                    machine.reset()
-                
-                asyncio.create_task(_restart())
-                
-                return f"""
-                <html><head>
-                    <title>Configuration Saved</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <style>
-                        body {{ font-family: Arial; margin: 20px; text-align: center; }}
-                    </style>
-                </head><body>
-                    <h1>Configuration Saved!</h1>
-                    <p>The device will now restart and try to connect to the selected network.</p>
-                </body></html>
-                """
+                try:
+                    self.config.set('WLAN_SSID', ssid)
+                    self.config.set('WLAN_PASSWORD', password)
+                    self.config.save()
+                    
+                    # Schedule restart after response is sent
+                    async def _restart():
+                        await asyncio.sleep(2)
+                        machine.reset()
+                    
+                    asyncio.create_task(_restart())
+                    
+                    return f"""
+                    <html><head>
+                        <title>Configuration Saved</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <style>
+                            body {{ font-family: Arial; margin: 20px; text-align: center; }}
+                        </style>
+                    </head><body>
+                        <h1>Configuration Saved!</h1>
+                        <p>The device will now restart and try to connect to the selected network.</p>
+                    </body></html>
+                    """
+                except Exception as e:
+                    print(f"Error saving config: {e}")
+                    return f"""
+                    <html><head>
+                        <title>Configuration Error</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <style>
+                            body {{ font-family: Arial; margin: 20px; text-align: center; color: #d32f2f; }}
+                        </style>
+                    </head><body>
+                        <h1>Configuration Error</h1>
+                        <p>Failed to save configuration. Please try again.</p>
+                        <p>Error: {str(e)}</p>
+                    </body></html>
+                    """
             
-            return Response.redirect('/wifi')
+            return Response.redirect('/wifi-config')
 
     def _scan_networks(self):
         """Scan for available WiFi networks"""
@@ -149,9 +169,13 @@ class WLANManager:
                  channel=1,
                  hidden=False)
         
+        # Start DNS server for captive portal
+        ip = ap.ifconfig()[0]
+        dns.run_catchall(ip)
+        
         print("Access Point active!")
         print(f"SSID: {ap_ssid}")
-        print(f"Configuration URL: http://{ap.ifconfig()[0]}/wifi")
+        print(f"Configuration URL: http://{ip}/wifi-config")
         
         return True
 
@@ -182,6 +206,9 @@ class WLANManager:
             if wlan.isconnected():
                 print("Successfully connected to WiFi")
                 print(f"IP: {wlan.ifconfig()[0]}")
+
+                gc.collect()
+                print("Memory after WiFi connection:", gc.mem_free())
                 return True
                 
             print("Could not connect to WiFi")
