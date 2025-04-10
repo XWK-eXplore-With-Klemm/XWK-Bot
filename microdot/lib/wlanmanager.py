@@ -7,6 +7,7 @@ import gc
 import network
 import time
 import ubinascii
+import sys
 from iniconf import Iniconf
 from microdot import Response
 from microdot.utemplate import Template
@@ -42,10 +43,10 @@ class WlanManagerUi:
         return 30
 
 class WlanManager:
-    def __init__(self, microdot, ui=None, project_name="MY-PROJECT", config=None):
+    def __init__(self, microdot=None, ui=None, project_name="MY-PROJECT", config=None):
         """
         Initialize WiFi manager
-        :param microdot: Microdot instance to add routes to
+        :param microdot: Optional Microdot instance (will create new one if needed)
         :param ui: Optional WlanManagerUi instance for UI interactions
         :param project_name: Name used for AP SSID (default: MY-PROJECT)
         :param config: Optional Iniconf instance for configuration (creates new one if None)
@@ -115,16 +116,8 @@ class WlanManager:
 
     def start_ap(self):
         """Start access point mode with configuration portal"""
-        # Only import heavy dependencies when AP mode is actually needed
-        import machine
-        from microdot import Response
-        from lib.phew import dns
-        
-        # Register routes for the captive portal
-        self._register_routes()
-        
-        print("Starting AP mode")
-        self.ui.on_scan_start()  # Add UI notification
+        gc.collect()
+        print("Memory at start of AP mode:", gc.mem_free())
         
         # Start AP mode
         ap = network.WLAN(network.AP_IF)
@@ -137,26 +130,56 @@ class WlanManager:
         mac = ubinascii.hexlify(sta_if.config('mac')).decode()
         ap_ssid = f"{self.project_name}-{mac[-4:].upper()}"
         
+        # ap.config(essid=ap_ssid,
+        #          authmode=network.AUTH_OPEN,
+        #          channel=1,
+        #          hidden=False)
+        
         ap.config(essid=ap_ssid,
-                 authmode=network.AUTH_OPEN,
-                 channel=1,
-                 hidden=False)
+                 authmode=0,
+                 max_clients=1)        
         
-        # Start DNS server for captive portal
-        ip = ap.ifconfig()[0]
-        dns.run_catchall(ip)
-        
-        self.ui.on_ap_start(ap_ssid, ip)  # Add UI notification
-        
-        print("Access Point active!")
-        print(f"SSID: {ap_ssid}")
-        print(f"Configuration URL: http://{ip}/wifi-config")
-        
-        return True
+        # Only initialize Microdot and DNS after AP is ready
+        try:
+            # Import dependencies only when needed
+            from microdot import Microdot, Response
+            from microdot.utemplate import Template
+            from lib.phew import dns
+            
+            # Create Microdot instance if not provided
+            if not self.microdot:
+                print("Creating new Microdot instance")
+                self.microdot = Microdot()
+                Response.default_content_type = 'text/html'
+                Template.initialize(template_dir='templates')
+            
+            # Register routes for the captive portal
+            self._register_routes()
+            
+            # Start DNS server for captive portal
+            ip = ap.ifconfig()[0]
+            dns.run_catchall(ip)
+            
+            self.ui.on_ap_start(ap_ssid, ip)
+            
+            print("Access Point active!")
+            print(f"SSID: {ap_ssid}")
+            print(f"Configuration URL: http://{ip}/wifi-config")
+            
+            # Start web server
+            print("Starting web server...")
+            self.microdot.start_server(host='0.0.0.0', port=80, debug=True)
+            
+            return True
+            
+        except Exception as e:
+            print("Error starting AP services:", e)
+            return False
 
     def _register_routes(self):
         """Register captive portal routes with microdot"""
-        from microdot import Response  # Only imported when needed
+        from microdot import Response
+        from microdot.utemplate import Template
         
         @self.microdot.route('/generate_204')  # Android
         @self.microdot.route('/gen_204')       # Android

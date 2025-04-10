@@ -1,78 +1,44 @@
-import bot
-bot.write("Starting XWK-Bot...", color=bot.WHITE)
+# main.py
+gc.collect()
+print("Memory after startup collect:", gc.mem_free())
+
+#global placeholder_blocks
+#placeholder_blocks = [bytearray(45000)]  # 45 KB reserved
+
+gc.collect()
+print("Memory after placeholder blocks:", gc.mem_free())
+
+#import bot
+#bot.write("Starting XWK-Bot...", color=bot.WHITE)
 
 import gc
-import asyncio
-from microdot import Microdot, Response
-from microdot.utemplate import Template
 from lib.wlanmanager import WlanManager
-from lib.wlan_manager_ui_bot import WlanManagerUiBot
+#from lib.wlan_manager_ui_bot import WlanManagerUiBot
 
+print("Memory at start of main:", gc.mem_free())
+gc.collect()
+print("Memory after GC:", gc.mem_free())
 
-# Create the Microdot instance
-microdot = Microdot()
-Response.default_content_type = 'text/html'
+# Initialize WiFi manager with Bot-specific UI handler
+#wlan = WlanManager(ui=WlanManagerUiBot(), project_name="XWK-BOT")
+wlan = WlanManager(project_name="XWK-BOT")
 
-# Initialize template system
-Template.initialize(template_dir='templates')
+# Free placeholder before AP mode
+# print("Memory before placeholder removal:", gc.mem_free())
+# del placeholder_blocks
+# gc.collect()
+# print("Memory after placeholder removal:", gc.mem_free())
 
-# Add after-request handler for garbage collection
-@microdot.after_request
-def cleanup(request, response):
-    print("after request: Garbage collection")
-    gc.collect()
-    print("Memory after GC:", gc.mem_free())
-    return response
+wlan.start_ap()
 
-@microdot.route('/')
-async def index(request):
-    gc.collect()
-    mem_free = gc.mem_free()
-    return Template('index.html').render(mem_free=mem_free)
+# First try to connect - this is lightweight and uses minimal RAM
+# if not wlan.connect():
+#     print("WiFi connection failed, starting AP mode...")
+#     # Only now load the heavy AP mode dependencies
+#     wlan.start_ap()  # This will now start the web server internally
 
-@microdot.route('/memory')
-async def memory(request):
-    gc.collect()
-    return {
-        'memory_free': gc.mem_free(),
-        'memory_alloc': gc.mem_alloc()
-    }
+print("Setup complete")
 
-async def main():
-    print("Memory before startup:", gc.mem_free())
-    gc.collect()
-    print("Memory after GC:", gc.mem_free())
-    
-    # Initialize WiFi manager with Bot-specificUI handler
-    wlan = WlanManager(microdot, ui=WlanManagerUiBot(), project_name="XWK-BOT")
-    
-    # First try to connect - this is lightweight and uses minimal RAM
-    # as it doesn't load the AP mode dependencies
-    if not wlan.connect():
-        print("WiFi connection failed, starting AP mode...")
-        # Only now load the heavy AP mode dependencies (microdot routes, dns server, etc)
-        wlan.start_ap()
-    
-    print("Network setup complete, starting web server...")
-    
-    try:
-        # Start web server
-        server = asyncio.create_task(microdot.start_server(host='0.0.0.0', port=80, debug=True))
-        
-        # Here you can add other async tasks if needed
-        # For example:
-        # other_task = asyncio.create_task(some_other_async_function())
-        
-        # Wait for the server task
-        await server
-        
-    except KeyboardInterrupt:
-        print("Server stopped")
-        print("Final memory:", gc.mem_free())
-
-# Start network and run web server
-if __name__ == '__main__':
-    asyncio.run(main())
 
 
 
