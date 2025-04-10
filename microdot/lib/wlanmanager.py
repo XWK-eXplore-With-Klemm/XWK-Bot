@@ -210,7 +210,7 @@ class WLANManager:
             return Response.redirect('/wifi-config')
 
     def _scan_networks(self):
-        """Scan for available WiFi networks"""
+        """Scan for available WiFi networks and sort by signal strength"""
         sta_if = network.WLAN(network.STA_IF)
         sta_if.active(True)
         time.sleep(1)
@@ -219,11 +219,14 @@ class WLANManager:
         for _ in range(3):  # Try scanning up to 3 times
             try:
                 scan_result = sta_if.scan()
-                networks = [net[0].decode('utf-8') for net in scan_result if net[0]]
+                # Each network tuple contains: ssid, bssid, channel, RSSI, security, hidden
+                # Convert to list of tuples (ssid, rssi) for sorting
+                networks = [(net[0].decode(), net[3]) for net in scan_result if net[0]]
                 if networks:
                     break
             except:
                 pass
             time.sleep(1)
         
-        return sorted(set(networks))  # Remove duplicates and sort 
+        # Sort by RSSI (strongest first) and extract only SSIDs
+        return [ssid for ssid, _ in sorted(set(networks), key=lambda x: x[1], reverse=True)] 
