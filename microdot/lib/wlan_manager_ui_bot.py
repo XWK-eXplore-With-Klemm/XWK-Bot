@@ -1,6 +1,6 @@
 """XWK-Bot-specific UI implementation for WlanManager"""
 
-from microdot.lib.wlanmanager import WlanManagerUi
+from lib.wlanmanager import WlanManagerUi
 import bot
 
 class WlanManagerUiBot(WlanManagerUi):

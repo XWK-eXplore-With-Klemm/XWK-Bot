@@ -39,7 +39,7 @@ async def main():
     gc.collect()
     print("Memory after GC:", gc.mem_free())
     
-    # Initialize WiFi manager with UI handler
+    # Initialize WiFi manager with Bot-specificUI handler
     wlan = WlanManager(microdot, ui=WlanManagerUiBot(), project_name="XWK-BOT")
     
     # First try to connect - this is lightweight and uses minimal RAM
