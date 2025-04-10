@@ -1,6 +1,8 @@
 import network
 import time
-from microdot import Microdot
+import gc
+from microdot import Microdot, Response
+from microdot.utemplate import Template
 
 # Access point settings
 AP_SSID = "MICRODOT-DEMO"
@@ -20,21 +22,40 @@ def start_access_point():
 
 # Create the Microdot app
 app = Microdot()
+Response.default_content_type = 'text/html'
+
+# Initialize template system
+Template.initialize(template_dir='templates')
 
 @app.route('/')
-def index(request):
-    return "Hello from Microdot!"
+async def index(request):
+    gc.collect()
+    mem_free = gc.mem_free()
+    #return Template('index.html').render(mem_free=mem_free)
+    return Template('index.html').render()
+
+@app.route('/memory')
+async def memory(request):
+    gc.collect()
+    return {
+        'memory_free': gc.mem_free(),
+        'memory_alloc': gc.mem_alloc()
+    }
 
 # Start AP and run web server
 if __name__ == '__main__':
+    print("Memory before startup:", gc.mem_free())
+    gc.collect()
+    print("Memory after GC:", gc.mem_free())
+    
     ap = start_access_point()
     print("Starting web server...")
-    app.run(port=80) 
-
-    import gc
-    print("Memory Free:", gc.mem_free())
-    gc.collect()  # run garbage collection to free ram
-    print("Memory Free:", gc.mem_free())
+    
+    try:
+        app.run(port=80, debug=True)
+    except KeyboardInterrupt:
+        print("Server stopped")
+        print("Final memory:", gc.mem_free())
 
 
 
