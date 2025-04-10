@@ -42,19 +42,18 @@ class WlanManagerUi:
         return 30
 
 class WlanManager:
-    def __init__(self, microdot, ui=None, project_name="MICRODOT", config_path="/config.ini"):
+    def __init__(self, microdot, ui=None, project_name="MICRODOT", config=None):
         """
         Initialize WiFi manager
         :param microdot: Microdot instance to add routes to
         :param ui: Optional WlanManagerUi instance for UI interactions
         :param project_name: Name used for AP SSID (default: MICRODOT)
-        :param config_path: Path to config file (default: /config.ini)
+        :param config: Optional Iniconf instance for configuration (creates new one if None)
         """
         self.microdot = microdot
         self.ui = ui or WlanManagerUi()
         self.project_name = project_name
-        self.config = Iniconf()
-        self.config.set_config_file(config_path)
+        self.config = config or Iniconf()
 
     def connect(self):
         """
