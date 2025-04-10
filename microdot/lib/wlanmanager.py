@@ -42,12 +42,12 @@ class WlanManagerUi:
         return 30
 
 class WlanManager:
-    def __init__(self, microdot, ui=None, project_name="MICRODOT", config=None):
+    def __init__(self, microdot, ui=None, project_name="MY-PROJECT", config=None):
         """
         Initialize WiFi manager
         :param microdot: Microdot instance to add routes to
         :param ui: Optional WlanManagerUi instance for UI interactions
-        :param project_name: Name used for AP SSID (default: MICRODOT)
+        :param project_name: Name used for AP SSID (default: MY-PROJECT)
         :param config: Optional Iniconf instance for configuration (creates new one if None)
         """
         self.microdot = microdot
@@ -135,7 +135,7 @@ class WlanManager:
         # Get last 4 characters of MAC address
         sta_if = network.WLAN(network.STA_IF)
         mac = ubinascii.hexlify(sta_if.config('mac')).decode()
-        ap_ssid = f"{self.project_name}_{mac[-4:].upper()}"
+        ap_ssid = f"{self.project_name}-{mac[-4:].upper()}"
         
         ap.config(essid=ap_ssid,
                  authmode=network.AUTH_OPEN,
