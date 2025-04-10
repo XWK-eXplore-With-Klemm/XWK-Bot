@@ -4,9 +4,9 @@
 #Fresh ESP32-Wroom-32 with Micropython v1.24.1
 
 import gc
-print("Memory Free:", gc.mem_free())      # Memory Free: 158144
-gc.collect()                              # run garbage collection to free ram
-print("Memory Free:", gc.mem_free())      # Memory Free: 161984 (!?!)
+print("Memory Free:", gc.mem_free())
+gc.collect()  # run garbage collection to free ram
+print("Memory Free:", gc.mem_free())
 
 import micropython
 micropython.mem_info()

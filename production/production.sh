@@ -40,18 +40,54 @@ fi
 #cd ..
 #echo
 
+# WLAN didn't connect with mode --no-flash here...
+echo "Deleting boot.py file if it exists..."
+mpremote resume fs rm boot.py || true
+echo
+
+echo "Resetting device..."
+mpremote reset
+echo
+
 echo "Setting up WiFi..."
 WLAN_SSID=$(grep "WLAN_SSID=" config.local.ini | cut -d'=' -f2)
 WLAN_PASSWORD=$(grep "WLAN_PASSWORD=" config.local.ini | cut -d'=' -f2)
-mpremote exec "import network; wlan = network.WLAN(network.STA_IF); wlan.active(True); wlan.connect('$WLAN_SSID', '$WLAN_PASSWORD')"
-sleep 2
+mpremote resume exec "
+import network
+import time
+
+# First check if AP mode is active and disable it
+ap = network.WLAN(network.AP_IF)
+if ap.active():
+    print('Access Point mode is active, disabling...')
+    ap.active(False)
+    time.sleep(1)
+
+# Now setup station mode
+wlan = network.WLAN(network.STA_IF)
+# First disconnect and deactivate to ensure clean connection
+wlan.disconnect()
+wlan.active(False)
+time.sleep(1)
+print('Activating new network...')
+wlan.active(True)
+print(f'Connecting to SSID: {\"$WLAN_SSID\"}...')
+wlan.connect('$WLAN_SSID', '$WLAN_PASSWORD')
+
+# Wait for connection
+while not wlan.isconnected():
+    print('Waiting for connection...')
+    time.sleep(1)
+print('WiFi Status: Connected' if wlan.isconnected() else 'WiFi Status: Not Connected')
+print(f'IP Address: {wlan.ifconfig()[0]}' if wlan.isconnected() else 'IP Address: None')
+"
 
 echo "Starting OTA update..."
-mpremote cp micropython/config.ini :/
-mpremote fs mkdir lib || true
-mpremote cp micropython/lib/iniconf.py :/lib/
-mpremote cp micropython/lib/ota.py :/lib/
-mpremote exec "from lib.ota import OTAUpdater; updater = OTAUpdater(); updater.update_all()"
+mpremote resume cp micropython/config.ini :/
+mpremote resume fs mkdir lib || true
+mpremote resume cp micropython/lib/iniconf.py :/lib/
+mpremote resume cp micropython/lib/ota.py :/lib/
+mpremote resume exec "from lib.ota import OTAUpdater; updater = OTAUpdater(); updater.update_all()"
 echo 
 
 echo "Resetting device..."
