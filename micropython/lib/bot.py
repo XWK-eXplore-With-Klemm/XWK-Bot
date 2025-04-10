@@ -2,6 +2,8 @@ import gc
 import machine
 from machine import Pin, SPI, ADC, PWM
 import time
+import network
+import ubinascii
 from ST7735 import TFT, TFTColor # GMT-177-01 128x160px TFTST7735 display
 from sysfont import sysfont
 import hcsr04 # ultra sound HC-SR04 sensor
@@ -573,7 +575,13 @@ def ir_is_bright_right():
     return infrared_right()
 
 
-### ### FRIENDLY FUNCTIONS
+### SYSTEM
+def get_ip():
+    wlan = network.WLAN(network.STA_IF)
+    return wlan.ifconfig()[0]
+
+
+### FRIENDLY FUNCTIONS
 def sleep(quantity, unit = "s"):
     if unit == "ms":
         return time.sleep_ms(quantity)
@@ -593,3 +601,246 @@ BUTTON_A = Pin(config.get('A_PIN'), Pin.IN, Pin.PULL_UP)
 
 def is_pressed(button):
     return not button.value()  # Returns True if button is pressed (low)
+
+### NETWORK SETUP
+def network_setup():
+    """Setup network connection using config.ini"""
+    print("Activating network")
+    import network
+    import ubinascii
+
+    # Try to load configuration
+    ssid = config.get('WLAN_SSID')
+    password = config.get('WLAN_PASSWORD')
+    
+    if not ssid or not password:
+        print("No valid WiFi configuration found - starting AP mode")
+        write("No WiFi config", color=YELLOW)
+        start_ap_mode()
+        return False
+
+    try:
+        wlan = network.WLAN(network.STA_IF)
+        if not wlan.active():
+            wlan.active(True)
+            #write("Activating WiFi...", color=GREY)
+            time.sleep(0.1)  # Give WiFi some time to initialize
+        
+        if not wlan.isconnected():
+            write("Connecting to WiFi", color=WHITE)
+            write(f"{ssid}", color=CYAN)
+            write("Press A to abort", color=GREY)
+            wlan.connect(ssid, password)
+
+            # Try to connect to WLAN
+            start_time = time.time()
+            #dots = 0
+            while not wlan.isconnected() and time.time() - start_time < 30:
+                # Check for abort button
+                if is_pressed(BUTTON_A):
+                    wlan.disconnect()
+                    sleep(1)
+                    break
+                    
+                # Show loading animation
+                #write("." if dots == 0 else "", color=CYAN)
+                #write(".", color=GREY)
+                #dots = (dots + 1) % 3
+                sleep(.2)
+
+            #tft.fill(BLACK)  # Clear the loading animation
+
+        if wlan.isconnected():
+            mac = ubinascii.hexlify(wlan.config('mac')).decode().upper()
+            mac = ":".join([mac[i:i+2] for i in range(0, len(mac), 2)])
+            ip_address = wlan.ifconfig()[0]
+            write("Success!", color=GREEN)
+            # write("Connected to WiFi")
+            # write(f"{ssid}", color=CYAN)
+            write(f"MAC: {mac}", color=GREY)
+            write("")  # Newline
+            write("Open in your webbrowser:", color=WHITE)
+            write(f"http://{ip_address}", color=CYAN)
+
+            gc.collect()  # Force garbage collection to free memory
+            
+            print("\nStarting webrepl")
+            try:
+                import webrepl
+                webrepl.start()
+            except Exception as e:
+                print("WebREPL error:", e)
+
+            gc.collect()  # Force garbage collection to free memory
+            
+            print("Starting IDE web service")
+            try:
+                import weditor.start
+            except Exception as e:
+                print("Web editor error:", e)
+            
+            gc.collect()  # Force garbage collection to free memory
+
+            return True
+        else:
+            print("")
+            print("WiFi not connected")
+            write("WiFi not connected", color=YELLOW)
+            print("Starting AP mode")
+            write("Starting AP mode")
+            sleep(1)
+                   
+            start_ap_mode()
+            return False
+            
+    except Exception as e:
+        print("WiFi setup error:", e)
+        start_ap_mode()
+        return False 
+
+def start_ap_mode():
+    """Start access point mode with configuration portal"""
+    import network
+    from microWebSrv import MicroWebSrv
+    
+    # First scan for networks
+    print("\nScanning for WiFi networks...")
+    write("Scanning for WiFis...", color=GREY)
+    sta_if = network.WLAN(network.STA_IF)
+    print("Deactivating WiFi")
+    sta_if.active(False)  # First deactivate
+    time.sleep(0.5)      # Wait a bit
+    print("Activating WiFi")
+    sta_if.active(True)  # Then reactivate
+    time.sleep(2)        # Give WiFi time to initialize
+    
+    networks = []
+    for _ in range(3):  # Try scanning up to 3 times
+        scan_result = sta_if.scan()
+        networks = [net for net in scan_result if net[0] and len(net[0].strip()) > 0]
+        if networks:
+            break
+        write("No networks found, retrying...", color=YELLOW)
+        time.sleep(1)
+    
+    networks.sort(key=lambda x: x[3], reverse=True)  # Sort by signal strength
+    
+    # tft.fill(BLACK)
+    # write("Available networks:", color=CYAN)
+    # for net in networks[:5]:  # Show top 5 networks
+    #     ssid = net[0].decode('utf-8')
+    #     rssi = net[3]
+    #     security = "🔒" if net[4] > 0 else "🔓"
+    #     write(f"{security} {ssid:20} RSSI:{rssi:3d}dB", color=WHITE)
+    
+    # Then start AP
+    ap = network.WLAN(network.AP_IF)
+    ap.active(False)  # First deactivate
+    time.sleep(0.1)   # Wait a bit
+    ap.active(True)   # Then reactivate
+    
+    # Get last 4 characters of MAC address
+    mac = ubinascii.hexlify(sta_if.config('mac')).decode()
+    ap_ssid = f"XWK_BOT_{mac[-4:].upper()}"
+    
+    # Configure the access point
+    ap.config(essid=ap_ssid,
+             authmode=network.AUTH_OPEN,
+             channel=1,
+             hidden=False)
+    
+    reset_terminal()
+    write("Access Point active!", color=GREEN)
+    write("Please connect to Wifi:")
+    write(f"{ap_ssid}", color=CYAN)
+
+    write("")
+    write("Then open in webbrowser:", color=WHITE)
+    write(f"http://{ap.ifconfig()[0]}", color=CYAN)
+    write("and configure your WiFi")
+
+    # Web server route handlers
+    def _httpHandlerConfig(httpClient, httpResponse):
+        # Create network options HTML
+        network_options = ""
+        for net in networks:
+            ssid = net[0].decode('utf-8')
+            network_options += f'<option value="{ssid}">{ssid}</option>'
+
+        content = f"""
+        <html><head>
+            <title>XWK-Bot WiFi Setup</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body {{ font-family: Arial; margin: 20px; }}
+                select, input {{ margin: 10px 0; padding: 5px; width: 200px; }}
+                form {{ max-width: 300px; margin: 0 auto; }}
+            </style>
+        </head><body>
+            <h1>XWK-Bot WiFi Setup</h1>
+            <form method="POST" action="/">
+                <select name="ssid" required>
+                    <option value="">Select Network...</option>
+                    {network_options}
+                </select><br>
+                <input type="text" name="password" placeholder="Password" required><br>
+                <input type="submit" value="Connect">
+            </form>
+        </body></html>
+        """
+        httpResponse.WriteResponseOk(
+            contentType="text/html",
+            contentCharset="UTF-8",
+            content=content)
+
+    def _httpHandlerConfigPost(httpClient, httpResponse):
+        formData = httpClient.ReadRequestPostedFormData()
+        ssid = formData["ssid"]
+        password = formData["password"]
+        
+        print(f"\nSaving WiFi configuration: {ssid}")
+        write(f"Saving WiFi configuration: {ssid}", color=GREY)
+        
+        # Save to config.ini using our config functions
+        config.set('WLAN_SSID', ssid)
+        config.set('WLAN_PASSWORD', password)
+        config.save()
+        
+        content = """
+        <html><head>
+            <title>Configuration Saved</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body { font-family: Arial; margin: 20px; text-align: center; }
+            </style>
+        </head><body>
+            <h1>Configuration Saved!</h1>
+            <p>The device will now restart and try to connect to the selected network.</p>
+        </body></html>
+        """
+        
+        httpResponse.WriteResponseOk(
+            headers = {"Connection": "close"},
+            contentType = "text/html",
+            contentCharset = "UTF-8",
+            content = content
+        )
+        
+        # Give browser time to render the response
+        time.sleep(2)
+        
+        # Schedule restart
+        def _restart():
+            time.sleep(1)
+            import machine
+            machine.reset()
+        import _thread
+        _thread.start_new_thread(_restart, ())
+
+    # Create and start web server
+    srv = MicroWebSrv(routeHandlers=[
+        ( "/", "GET", _httpHandlerConfig ),
+        ( "/", "POST", _httpHandlerConfigPost )
+    ])
+    
+    srv.Start(threaded=True)
