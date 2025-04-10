@@ -3,6 +3,7 @@ import asyncio
 from microdot import Microdot, Response
 from microdot.utemplate import Template
 from lib.wlanmanager import WlanManager
+from lib.wlan_manager_ui_bot import WlanManagerUiBot
 
 # Create the Microdot instance
 microdot = Microdot()
@@ -38,8 +39,8 @@ async def main():
     gc.collect()
     print("Memory after GC:", gc.mem_free())
     
-    # Initialize WiFi manager with custom project name
-    wlan = WlanManager(microdot, project_name="MYPROJECT")
+    # Initialize WiFi manager with UI handler
+    wlan = WlanManager(microdot, ui=WlanManagerUiBot(), project_name="XWK-BOT")
     
     # First try to connect - this is lightweight and uses minimal RAM
     # as it doesn't load the AP mode dependencies

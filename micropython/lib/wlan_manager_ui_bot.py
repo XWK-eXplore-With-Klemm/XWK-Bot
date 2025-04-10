@@ -1,17 +1,9 @@
 """XWK-Bot-specific UI implementation for WlanManager"""
 
-from machine import Pin
 from microdot.lib.wlanmanager import WlanManagerUi
 import bot
 
 class WlanManagerUiBot(WlanManagerUi):
-    def __init__(self, button_a_pin):
-        """
-        Initialize Bot UI handler
-        :param button_a_pin: Pin object for abort button
-        """
-        self.button_a = button_a_pin
-    
     def on_scan_start(self):
         bot.write("Scanning for WiFis...", color=bot.GREY)
     
@@ -68,7 +60,7 @@ class WlanManagerUiBot(WlanManagerUi):
     
     def should_abort_connection(self) -> bool:
         """Check if button A is pressed to abort"""
-        return bot.is_pressed(self.button_a)
+        return bot.is_pressed(bot.BUTTON_A)
     
     def get_connection_timeout(self) -> int:
         """Get connection timeout in seconds"""
