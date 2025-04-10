@@ -14,15 +14,23 @@ from microdot.utemplate import Template
 class WlanManagerUi:
     """Base UI handler interface for WlanManager"""
     
-    # Status/Output methods
-    def on_scan_start(self): pass
-    def on_scan_complete(self, networks): pass
+    # Connection status
+    def on_connect_no_wifi_config_found(self): pass
     def on_connect_start(self, ssid): pass
     def on_connect_progress(self): pass
     def on_connect_success(self, ip, mac): pass
-    def on_connect_failure(self, error): pass
+    def on_connect_timeout(self): pass
+    def on_connect_aborted(self): pass
+    def on_connect_failed(self): pass
+    def on_connect_error(self, error): pass
+    
+    # AP mode status
     def on_ap_start(self, ap_ssid, ip): pass
     def on_config_saved(self, ssid): pass
+    
+    # Network scanning
+    def on_scan_start(self): pass
+    def on_scan_complete(self, networks): pass
     
     # Input/Control methods
     def should_abort_connection(self) -> bool:
@@ -61,7 +69,7 @@ class WlanManager:
         
         if not ssid or not password:
             print("No valid WiFi configuration found")
-            self.ui.on_connect_failure("No valid WiFi configuration found")
+            self.ui.on_connect_no_wifi_config_found()
             return False
 
         try:
@@ -77,9 +85,14 @@ class WlanManager:
                 while not wlan.isconnected() and time.time() - start_time < self.ui.get_connection_timeout():
                     if self.ui.should_abort_connection():
                         wlan.disconnect()
+                        self.ui.on_connect_aborted()
                         return False
                     self.ui.on_connect_progress()
                     time.sleep(0.2)
+
+                if not wlan.isconnected():
+                    self.ui.on_connect_timeout()
+                    return False
 
             if wlan.isconnected():
                 print("Successfully connected to WiFi")
@@ -93,12 +106,12 @@ class WlanManager:
                 return True
                 
             print("Could not connect to WiFi")
-            self.ui.on_connect_failure("Could not connect to WiFi")
+            self.ui.on_connect_failed()
             return False
             
         except Exception as e:
             print("WiFi connection error:", e)
-            self.ui.on_connect_failure(str(e))
+            self.ui.on_connect_error(e)
             return False
 
     def start_ap(self):
