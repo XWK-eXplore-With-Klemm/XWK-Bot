@@ -700,8 +700,14 @@ def network_setup():
 
 def start_ap_mode():
     """Start access point mode with configuration portal"""
+    print("Starting AP mode")
     import network
     from microWebSrv import MicroWebSrv
+
+    import gc
+    print("Memory Free:", gc.mem_free())      # Memory Free: 158144
+    gc.collect()
+    print("Memory Free:", gc.mem_free())      # Memory Free: 158144
     
     # First scan for networks
     print("\nScanning for WiFi networks...")
@@ -758,6 +764,11 @@ def start_ap_mode():
     write("Then open in webbrowser:", color=WHITE)
     write(f"http://{ap.ifconfig()[0]}", color=CYAN)
     write("and configure your WiFi")
+
+    import gc
+    print("Memory Free:", gc.mem_free())      # Memory Free: 158144
+    gc.collect()
+    print("Memory Free:", gc.mem_free())      # Memory Free: 158144
 
     # Web server route handlers
     def _httpHandlerConfig(httpClient, httpResponse):
