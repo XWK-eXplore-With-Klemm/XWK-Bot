@@ -128,8 +128,9 @@ class WlanManager:
         ap_ssid = f"{self.project_name}-{mac[-4:].upper()}"
         
         ap.config(essid=ap_ssid,
-                 authmode=0)        
-        #max_clients=1
+             authmode=network.AUTH_OPEN,
+             channel=1,
+             hidden=False)
         
         # Get AP IP and notify UI before loading web dependencies
         ip = ap.ifconfig()[0]
@@ -137,6 +138,10 @@ class WlanManager:
         
         print("Access Point active!")
         print(f"SSID: {ap_ssid}")
+        print(f"IP: {ip}")
+
+        # Skip microdot web server
+        #return True
         
         # Only now load web dependencies and start server
         try:
@@ -145,27 +150,39 @@ class WlanManager:
             print("Memory before web imports:", gc.mem_free())
             
             # Import web dependencies
-            from microdot import Microdot, Response
-            from microdot.utemplate import Template
+            #from microdot import Microdot, Response
+            #from microdot.utemplate import Template
             from lib.phew import dns
-            
+
+            gc.collect()
+            print("Memory after web imports:", gc.mem_free())
             # Create Microdot instance if needed
-            if not self.microdot:
-                print("Creating new Microdot instance")
-                self.microdot = Microdot()
-                Response.default_content_type = 'text/html'
-                Template.initialize(template_dir='templates')
+            # if not self.microdot:
+            #     print("Creating new Microdot instance")
+            #     self.microdot = Microdot()
+            #     Response.default_content_type = 'text/html'
+            #     Template.initialize(template_dir='templates')
+
+            gc.collect()
+            print("Memory after Microdot instance:", gc.mem_free())
             
             print("Registering routes...")
-            self._register_routes()
+            #self._register_routes()
+
+            gc.collect()
+            print("Memory after routes:", gc.mem_free())
             
             print("Starting DNS server...")
-            dns.run_catchall(ip)
+            #dns.run_catchall(ip)
+
+            gc.collect()
+            print("Memory after DNS server:", gc.mem_free())
             
             print(f"Configuration URL: http://{ip}/wifi-config")
             
             print("Starting web server...")
-            self.microdot.start_server(host='0.0.0.0', port=80, debug=True)
+            #self.microdot.start_server(host='0.0.0.0', port=80, debug=True)
+            #self.microdot.run(host='0.0.0.0', port=80, debug=True)
 
             gc.collect()
             print("Memory after web server:", gc.mem_free())
