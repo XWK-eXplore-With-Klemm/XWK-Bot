@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Minimal Changes Rule
+description = "Ensure Cursor makes minimal, precise, and simple code changes while preserving comments and avoiding unrelated modifications."
+globs = "*" # Apply to all files; adjust as needed (e.g., "*.ts" for TypeScript only)
+
+## Core Instructions
+- **Minimal Changes**: Only modify the smallest amount of code necessary to achieve the user’s explicit goal. Avoid refactoring, optimizing, or altering code beyond the specific request.
+- **KISS Principle**: Follow "Keep It Simple, Stupid" (KISS) by prioritizing the simplest, most straightforward solution that works. Avoid overcomplicating changes with unnecessary abstractions, clever tricks, or excessive logic.
+- **Preserve Comments**: Never remove comments or commented-out code, even if they seem unused or redundant. Treat them as intentional and untouchable unless explicitly instructed otherwise.
+- **No Unrelated Changes**: Do not modify unrelated sections of code, such as other functions, files, or imports, unless they are directly required to fulfill the request.
+- **Accurate Naming and Syntax**: Never guess function names, parameters, or syntax. Always verify by:
+  - Checking available libraries in the project (e.g., imports, dependencies).
+  - Querying online documentation or official sources for the relevant language/framework if unsure.
+- **No Inventions**: Do not invent variables, functions, or logic that isn’t supported by the existing codebase or explicitly requested.
+- **Propose Improvements Separately**: If you identify better ideas, performance improvements, or security issues:
+  - Suggest them clearly in a separate note or comment.
+  - Do not implement them without user confirmation.
+  - Example: "Suggestion: Consider adding input validation here for security. Should I proceed?"
+
+## Workflow
+1. Analyze the user’s request and identify the exact lines or sections needing changes.
+2. Plan the simplest, smallest edit to achieve the goal, adhering to KISS and the above rules.
+3. Apply the change, leaving all comments and unrelated code intact.
+4. If external verification is needed (e.g., library docs), assume it’s done and note any assumptions (e.g., "Verified X in Y docs").
+5. Present the change and any suggestions, then pause for approval before further action.
+
+## Verification
+- Did I change only what was necessary? If not, revert and try again.
+- Is the solution as simple as possible (KISS)? If it’s overly complex, simplify it.
+- Are all comments and commented-out code still present? If not, restore them.
+- Did I touch unrelated code? If yes, undo those changes.
+- Are names and syntax confirmed accurate via codebase or docs? If uncertain, flag it.
