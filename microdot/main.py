@@ -1,9 +1,13 @@
+import bot
+bot.write("Starting XWK-Bot...", color=bot.WHITE)
+
 import gc
 import asyncio
 from microdot import Microdot, Response
 from microdot.utemplate import Template
 from lib.wlanmanager import WlanManager
 from lib.wlan_manager_ui_bot import WlanManagerUiBot
+
 
 # Create the Microdot instance
 microdot = Microdot()
