@@ -1,6 +1,7 @@
 import network
 import time
 import gc
+import asyncio
 from microdot import Microdot, Response
 from microdot.utemplate import Template
 
@@ -41,8 +42,7 @@ async def memory(request):
         'memory_alloc': gc.mem_alloc()
     }
 
-# Start AP and run web server
-if __name__ == '__main__':
+async def main():
     print("Memory before startup:", gc.mem_free())
     gc.collect()
     print("Memory after GC:", gc.mem_free())
@@ -51,10 +51,23 @@ if __name__ == '__main__':
     print("Starting web server...")
     
     try:
-        app.run(port=80, debug=True)
+        # start the server in a background task
+        server = asyncio.create_task(app.start_server(host='0.0.0.0', port=80, debug=True))
+        
+        # Here you can add other async tasks if needed
+        # For example:
+        # other_task = asyncio.create_task(some_other_async_function())
+        
+        # Wait for the server task
+        await server
+        
     except KeyboardInterrupt:
         print("Server stopped")
         print("Final memory:", gc.mem_free())
+
+# Start AP and run web server
+if __name__ == '__main__':
+    asyncio.run(main())
 
 
 
