@@ -2,7 +2,7 @@ import gc
 import asyncio
 from microdot import Microdot, Response
 from microdot.utemplate import Template
-from lib.wlanmanager import WLANManager
+from lib.wlanmanager import WlanManager
 
 # Create the Microdot instance
 microdot = Microdot()
@@ -39,7 +39,7 @@ async def main():
     print("Memory after GC:", gc.mem_free())
     
     # Initialize WiFi manager with custom project name
-    wlan = WLANManager(microdot, project_name="MYPROJECT")
+    wlan = WlanManager(microdot, project_name="MYPROJECT")
     
     # First try to connect - this is lightweight and uses minimal RAM
     # as it doesn't load the AP mode dependencies
