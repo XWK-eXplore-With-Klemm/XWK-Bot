@@ -11,15 +11,39 @@ from iniconf import Iniconf
 from microdot import Response
 from microdot.utemplate import Template
 
-class WLANManager:
-    def __init__(self, microdot, project_name="MICRODOT", config_path="/config.ini"):
+class WlanManagerUi:
+    """Base UI handler interface for WlanManager"""
+    
+    # Status/Output methods
+    def on_scan_start(self): pass
+    def on_scan_complete(self, networks): pass
+    def on_connect_start(self, ssid): pass
+    def on_connect_progress(self): pass
+    def on_connect_success(self, ip, mac): pass
+    def on_connect_failure(self, error): pass
+    def on_ap_start(self, ap_ssid, ip): pass
+    def on_config_saved(self, ssid): pass
+    
+    # Input/Control methods
+    def should_abort_connection(self) -> bool:
+        """Check if connection attempt should be aborted"""
+        return False
+    
+    def get_connection_timeout(self) -> int:
+        """Get connection timeout in seconds"""
+        return 30
+
+class WlanManager:
+    def __init__(self, microdot, ui=None, project_name="MICRODOT", config_path="/config.ini"):
         """
         Initialize WiFi manager
         :param microdot: Microdot instance to add routes to
+        :param ui: Optional WlanManagerUi instance for UI interactions
         :param project_name: Name used for AP SSID (default: MICRODOT)
         :param config_path: Path to config file (default: /config.ini)
         """
         self.microdot = microdot
+        self.ui = ui or WlanManagerUi()
         self.project_name = project_name
         self.config = Iniconf()
         self.config.set_config_file(config_path)
@@ -29,7 +53,7 @@ class WLANManager:
         Try to connect to configured WiFi network
         Returns True if connected, False if connection failed
         """
-        gc.collect()  # Clean up before starting
+        gc.collect()
         print("Memory before WiFi:", gc.mem_free())
         
         ssid = self.config.get('WLAN_SSID')
@@ -37,6 +61,7 @@ class WLANManager:
         
         if not ssid or not password:
             print("No valid WiFi configuration found")
+            self.ui.on_connect_failure("No valid WiFi configuration found")
             return False
 
         try:
@@ -45,24 +70,35 @@ class WLANManager:
             
             if not wlan.isconnected():
                 print(f"Connecting to WiFi: {ssid}")
+                self.ui.on_connect_start(ssid)
                 wlan.connect(ssid, password)
 
                 start_time = time.time()
-                while not wlan.isconnected() and time.time() - start_time < 30:
+                while not wlan.isconnected() and time.time() - start_time < self.ui.get_connection_timeout():
+                    if self.ui.should_abort_connection():
+                        wlan.disconnect()
+                        return False
+                    self.ui.on_connect_progress()
                     time.sleep(0.2)
 
             if wlan.isconnected():
                 print("Successfully connected to WiFi")
-                print(f"IP: {wlan.ifconfig()[0]}")
+                mac = ubinascii.hexlify(wlan.config('mac')).decode().upper()
+                mac = ":".join([mac[i:i+2] for i in range(0, len(mac), 2)])
+                ip = wlan.ifconfig()[0]
+                print(f"IP: {ip}")
+                self.ui.on_connect_success(ip, mac)
                 gc.collect()
                 print("Memory after WiFi connection:", gc.mem_free())
                 return True
                 
             print("Could not connect to WiFi")
+            self.ui.on_connect_failure("Could not connect to WiFi")
             return False
             
         except Exception as e:
             print("WiFi connection error:", e)
+            self.ui.on_connect_failure(str(e))
             return False
 
     def start_ap(self):
@@ -74,6 +110,9 @@ class WLANManager:
         
         # Register routes for the captive portal
         self._register_routes()
+        
+        print("Starting AP mode")
+        self.ui.on_scan_start()  # Add UI notification
         
         # Start AP mode
         ap = network.WLAN(network.AP_IF)
@@ -94,6 +133,8 @@ class WLANManager:
         # Start DNS server for captive portal
         ip = ap.ifconfig()[0]
         dns.run_catchall(ip)
+        
+        self.ui.on_ap_start(ap_ssid, ip)  # Add UI notification
         
         print("Access Point active!")
         print(f"SSID: {ap_ssid}")
@@ -139,7 +180,7 @@ class WLANManager:
         async def wifi_config_post(request):
             """Handle WiFi configuration form submission"""
             import machine
-            import asyncio  # Import here where it's actually used
+            import asyncio
             
             form = request.form
             ssid = form.get('ssid')
@@ -151,8 +192,8 @@ class WLANManager:
                     self.config.set('WLAN_SSID', ssid)
                     self.config.set('WLAN_PASSWORD', password)
                     self.config.save()
+                    self.ui.on_config_saved(ssid)
                     
-                    # Schedule restart after response is sent
                     async def _restart():
                         await asyncio.sleep(2)
                         machine.reset()
