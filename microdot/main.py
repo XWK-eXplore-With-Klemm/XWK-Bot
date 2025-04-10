@@ -4,9 +4,12 @@ import gc
 import asyncio
 from microdot import Microdot, Response
 from microdot.utemplate import Template
+from lib.phew import dns
 
 # Access point settings
 AP_SSID = "MICRODOT-DEMO"
+AP_IP = "192.168.4.1"
+AP_DOMAIN = "esp32.wifi"
 
 def start_access_point():
     """Configure device as access point"""
@@ -48,10 +51,13 @@ async def main():
     print("Memory after GC:", gc.mem_free())
     
     ap = start_access_point()
-    print("Starting web server...")
+    print("Starting DNS and web server...")
     
     try:
-        # start the server in a background task
+        # Start DNS server
+        dns.run_catchall(AP_IP)
+        
+        # Start web server in background
         server = asyncio.create_task(app.start_server(host='0.0.0.0', port=80, debug=True))
         
         # Here you can add other async tasks if needed
