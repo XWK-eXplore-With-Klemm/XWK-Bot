@@ -2,7 +2,7 @@ import gc
 import machine
 from machine import Pin, SPI, ADC, PWM
 import time
-from ST7735 import TFT, TFTColor # GMT-177-01 128x160px TFTST7735 display
+from ST7735_minimal import TFT, TFTColor # GMT-177-01 128x160px TFTST7735 display
 from sysfont import sysfont
 import hcsr04 # ultra sound HC-SR04 sensor
 import os
