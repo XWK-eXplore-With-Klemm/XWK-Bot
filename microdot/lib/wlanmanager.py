@@ -8,6 +8,8 @@ import network
 import time
 import ubinascii
 from iniconf import Iniconf
+from microdot import Response
+from microdot.utemplate import Template
 
 class WLANManager:
     def __init__(self, microdot, project_name="MICRODOT", config_path="/config.ini"):
@@ -128,32 +130,10 @@ class WLANManager:
         async def wifi_config(request):
             """Serve WiFi configuration page"""
             networks = self._scan_networks()
-            network_options = "".join([
-                f'<option value="{ssid}">{ssid}</option>'
-                for ssid in networks
-            ])
-            
-            return f"""
-            <html><head>
-                <title>{self.project_name} WiFi Setup</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <style>
-                    body {{ font-family: Arial; margin: 20px; }}
-                    select, input {{ margin: 10px 0; padding: 5px; width: 200px; }}
-                    form {{ max-width: 300px; margin: 0 auto; }}
-                </style>
-            </head><body>
-                <h1>{self.project_name} WiFi Setup</h1>
-                <form method="POST" action="/wifi-config">
-                    <select name="ssid" required>
-                        <option value="">Select Network...</option>
-                        {network_options}
-                    </select><br>
-                    <input type="text" name="password" placeholder="Password" required><br>
-                    <input type="submit" value="Connect">
-                </form>
-            </body></html>
-            """
+            return Template('wlanmanager_config.html').render(
+                project_name=self.project_name,
+                networks=networks
+            )
 
         @self.microdot.route('/wifi-config', methods=['POST'])
         async def wifi_config_post(request):
@@ -179,33 +159,11 @@ class WLANManager:
                     
                     asyncio.create_task(_restart())
                     
-                    return f"""
-                    <html><head>
-                        <title>Configuration Saved</title>
-                        <meta name="viewport" content="width=device-width, initial-scale=1">
-                        <style>
-                            body {{ font-family: Arial; margin: 20px; text-align: center; }}
-                        </style>
-                    </head><body>
-                        <h1>Configuration Saved!</h1>
-                        <p>The device will now restart and try to connect to the selected network.</p>
-                    </body></html>
-                    """
+                    return Template('wlanmanager_success.html').render()
+                    
                 except Exception as e:
                     print(f"Error saving config: {e}")
-                    return f"""
-                    <html><head>
-                        <title>Configuration Error</title>
-                        <meta name="viewport" content="width=device-width, initial-scale=1">
-                        <style>
-                            body {{ font-family: Arial; margin: 20px; text-align: center; color: #d32f2f; }}
-                        </style>
-                    </head><body>
-                        <h1>Configuration Error</h1>
-                        <p>Failed to save configuration. Please try again.</p>
-                        <p>Error: {str(e)}</p>
-                    </body></html>
-                    """
+                    return Template('wlanmanager_error.html').render(error=str(e))
             
             return Response.redirect('/wifi-config')
 
