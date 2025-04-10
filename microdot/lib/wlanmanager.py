@@ -1,13 +1,15 @@
 """
-WiFi configuration manager for Microdot
-Handles both station (client) and access point modes with captive portal
+WiFi configuration manager with web configuration portal
 """
 
 import gc
 import network
 import time
 import ubinascii
+import json
 from iniconf import Iniconf
+from microWebSrv import MicroWebSrv
+from lib.phew import dns
 
 class WlanManagerUi:
     """Base UI handler interface for WlanManager"""
@@ -40,18 +42,17 @@ class WlanManagerUi:
         return 30
 
 class WlanManager:
-    def __init__(self, microdot=None, ui=None, project_name="MY-PROJECT", config=None):
+    def __init__(self, ui=None, project_name="MY-PROJECT", config=None):
         """
         Initialize WiFi manager
-        :param microdot: Optional Microdot instance (will create new one if needed)
         :param ui: Optional WlanManagerUi instance for UI interactions
         :param project_name: Name used for AP SSID (default: MY-PROJECT)
         :param config: Optional Iniconf instance for configuration (creates new one if None)
         """
-        self.microdot = microdot
         self.ui = ui or WlanManagerUi()
         self.project_name = project_name
         self.config = config or Iniconf()
+        self.web_server = None
 
     def connect(self):
         """
@@ -128,9 +129,9 @@ class WlanManager:
         ap_ssid = f"{self.project_name}-{mac[-4:].upper()}"
         
         ap.config(essid=ap_ssid,
-             authmode=network.AUTH_OPEN,
-             channel=1,
-             hidden=False)
+                 authmode=network.AUTH_OPEN,
+                 channel=1,
+                 hidden=False)
         
         # Get AP IP and notify UI before loading web dependencies
         ip = ap.ifconfig()[0]
@@ -140,126 +141,100 @@ class WlanManager:
         print(f"SSID: {ap_ssid}")
         print(f"IP: {ip}")
 
-        # Skip microdot web server
-        #return True
-        
-        # Only now load web dependencies and start server
         try:
-            print("Loading web dependencies...")
-            gc.collect()
-            print("Memory before web imports:", gc.mem_free())
-            
-            # Import web dependencies
-            #from microdot import Microdot, Response
-            #from microdot.utemplate import Template
-            from lib.phew import dns
-
-            gc.collect()
-            print("Memory after web imports:", gc.mem_free())
-            # Create Microdot instance if needed
-            # if not self.microdot:
-            #     print("Creating new Microdot instance")
-            #     self.microdot = Microdot()
-            #     Response.default_content_type = 'text/html'
-            #     Template.initialize(template_dir='templates')
-
-            gc.collect()
-            print("Memory after Microdot instance:", gc.mem_free())
-            
-            print("Registering routes...")
-            #self._register_routes()
-
-            gc.collect()
-            print("Memory after routes:", gc.mem_free())
-            
-            print("Starting DNS server...")
-            #dns.run_catchall(ip)
-
-            gc.collect()
-            print("Memory after DNS server:", gc.mem_free())
-            
-            print(f"Configuration URL: http://{ip}/wifi-config")
-            
             print("Starting web server...")
-            #self.microdot.start_server(host='0.0.0.0', port=80, debug=True)
-            #self.microdot.run(host='0.0.0.0', port=80, debug=True)
-
             gc.collect()
-            print("Memory after web server:", gc.mem_free())
+            print("Memory before web server:", gc.mem_free())
             
+            # Start DNS server for captive portal
+            print("Starting DNS server...")
+            dns.run_catchall(ip)
+            
+            # Setup route handlers
+            route_handlers = [
+                # Android/iOS/Windows captive portal detection
+                ('/generate_204', 'GET', self._handle_captive_portal),
+                ('/gen_204', 'GET', self._handle_captive_portal),
+                ('/ncsi.txt', 'GET', self._handle_captive_portal),
+                ('/hotspot-detect.html', 'GET', self._handle_captive_portal),
+                ('/library/test/success.html', 'GET', self._handle_captive_portal),
+                ('/connecttest.txt', 'GET', self._handle_windows_test),
+                ('/fwlink', 'GET', self._handle_captive_portal),
+                
+                # Main config routes
+                ('/wifi-config', 'GET', self._handle_wifi_config),
+                ('/wifi-config', 'POST', self._handle_wifi_config_post),
+                
+                # Scan networks route
+                ('/networks', 'GET', self._handle_network_scan)
+            ]
+            
+            # Create and start web server
+            self.web_server = MicroWebSrv(routeHandlers=route_handlers, port=80)
+            self.web_server.Start(threaded=True)
+            
+            gc.collect()
+            print("Memory after web server start:", gc.mem_free())
             return True
             
         except Exception as e:
             print("Error starting web services:", e)
-            # AP is still running even if web server failed
-            return True
+            return False
 
-    def _register_routes(self):
-        """Register captive portal routes with microdot"""
-        from microdot import Response
-        from microdot.utemplate import Template
+    def _handle_captive_portal(self, client, response):
+        """Redirect captive portal detection to config page"""
+        ap = network.WLAN(network.AP_IF)
+        ip = ap.ifconfig()[0]
+        response.WriteResponseRedirect(f'http://{ip}/wifi-config')
+
+    def _handle_windows_test(self, client, response):
+        """Handle Windows connection test"""
+        response.WriteResponseOk(content="Microsoft Connect Test")
+
+    def _handle_wifi_config(self, client, response):
+        """Serve WiFi configuration page"""
+        networks = self._scan_networks()
+        with open('templates/wlanmanager_config.html', 'r') as f:
+            content = f.read()
+            # Simple template replacement
+            content = content.replace('{{project_name}}', self.project_name)
+            content = content.replace('{{networks}}', json.dumps(networks))
+        response.WriteResponseOk(contentType="text/html", content=content)
+
+    def _handle_wifi_config_post(self, client, response):
+        """Handle WiFi configuration form submission"""
+        form_data = client.ReadRequestPostedFormData()
+        ssid = form_data.get('ssid')
+        password = form_data.get('password')
         
-        @self.microdot.route('/generate_204')  # Android
-        @self.microdot.route('/gen_204')       # Android
-        @self.microdot.route('/ncsi.txt')      # Windows
-        @self.microdot.route('/hotspot-detect.html')  # iOS
-        @self.microdot.route('/library/test/success.html')  # iOS
-        async def captive_portal_check(request):
-            """Redirect all captive portal detection requests to the index page"""
-            ap = network.WLAN(network.AP_IF)
-            ip = ap.ifconfig()[0]
-            return Response(body='', status_code=302, headers={'Location': f'http://{ip}/wifi-config'})
+        if ssid and password:
+            print(f"Saving WiFi configuration: {ssid}")
+            try:
+                self.config.set('WLAN_SSID', ssid)
+                self.config.set('WLAN_PASSWORD', password)
+                self.config.save()
+                self.ui.on_config_saved(ssid)
+                
+                with open('templates/wlanmanager_success.html', 'r') as f:
+                    content = f.read()
+                response.WriteResponseOk(contentType="text/html", content=content)
+                
+                # Schedule reset
+                import machine
+                machine.Timer(-1).init(period=2000, mode=machine.Timer.ONE_SHOT, callback=lambda t:machine.reset())
+                
+            except Exception as e:
+                print(f"Error saving config: {e}")
+                with open('templates/wlanmanager_error.html', 'r') as f:
+                    content = f.read().replace('{{error}}', str(e))
+                response.WriteResponseOk(contentType="text/html", content=content)
+        else:
+            response.WriteResponseRedirect('/wifi-config')
 
-        @self.microdot.route('/connecttest.txt')  # Windows
-        async def windows_connect_test(request):
-            """Return Microsoft Connect Test response"""
-            return "Microsoft Connect Test"
-
-        @self.microdot.route('/fwlink')  # Windows
-        async def windows_redirect(request):
-            """Redirect Windows captive portal requests"""
-            return Response.redirect('/wifi-config')
-
-        @self.microdot.route('/wifi-config')
-        async def wifi_config(request):
-            """Serve WiFi configuration page"""
-            networks = self._scan_networks()
-            return Template('wlanmanager_config.html').render(
-                project_name=self.project_name,
-                networks=networks
-            )
-
-        @self.microdot.route('/wifi-config', methods=['POST'])
-        async def wifi_config_post(request):
-            """Handle WiFi configuration form submission"""
-            import machine
-            import asyncio
-            
-            form = request.form
-            ssid = form.get('ssid')
-            password = form.get('password')
-            
-            if ssid and password:
-                print(f"Saving WiFi configuration: {ssid}")
-                try:
-                    self.config.set('WLAN_SSID', ssid)
-                    self.config.set('WLAN_PASSWORD', password)
-                    self.config.save()
-                    self.ui.on_config_saved(ssid)
-                    
-                    async def _restart():
-                        await asyncio.sleep(2)
-                        machine.reset()
-                    
-                    asyncio.create_task(_restart())
-                    
-                    return Template('wlanmanager_success.html').render()
-                    
-                except Exception as e:
-                    print(f"Error saving config: {e}")
-                    return Template('wlanmanager_error.html').render(error=str(e))
-            
-            return Response.redirect('/wifi-config')
+    def _handle_network_scan(self, client, response):
+        """Handle network scan request"""
+        networks = self._scan_networks()
+        response.WriteResponseJSONOk(networks)
 
     def _scan_networks(self):
         """Scan for available WiFi networks and sort by signal strength"""

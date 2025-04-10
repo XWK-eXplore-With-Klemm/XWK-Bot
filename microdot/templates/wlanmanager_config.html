@@ -12,9 +12,12 @@
     <form method="POST" action="/wifi-config">
         <select name="ssid" required>
             <option value="">Select Network...</option>
-            {% for ssid in networks %}
-            <option value="{{ ssid }}">{{ ssid }}</option>
-            {% endfor %}
+            <script>
+                var networks = {{ networks }};
+                networks.forEach(function(ssid) {
+                    document.write('<option value="' + ssid + '">' + ssid + '</option>');
+                });
+            </script>
         </select><br>
         <input type="text" name="password" placeholder="Password" required><br>
         <input type="submit" value="Connect">
