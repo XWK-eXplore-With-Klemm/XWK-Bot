@@ -31,8 +31,7 @@ Template.initialize(template_dir='templates')
 async def index(request):
     gc.collect()
     mem_free = gc.mem_free()
-    #return Template('index.html').render(mem_free=mem_free)
-    return Template('index.html').render()
+    return Template('index.html').render(mem_free=mem_free)
 
 @app.route('/memory')
 async def memory(request):
