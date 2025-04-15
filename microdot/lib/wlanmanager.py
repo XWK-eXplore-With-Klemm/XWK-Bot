@@ -160,11 +160,29 @@ class WlanManager:
                 ('/wifi-config', 'POST', self._handle_wifi_config_post)
             ]
             
-            # Create and start web server
-            self.web_server = MicroWebSrv(routeHandlers=route_handlers, port=80)
+            # Set up captive portal redirects for common URLs
+            captive_portal_urls = [
+                '/',  # Root path
+                '/generate_204',  # Android
+                '/hotspot-detect.html',  # Apple
+                '/connecttest.txt',  # Windows
+                '/ncsi.txt',  # Windows
+                '/fwlink/',  # Microsoft
+                '/redirect'  # Common redirect
+            ]
             
-            # Set up captive portal redirect for all unhandled URLs
-            self.web_server.SetNotFoundPageUrl(f'http://{ip}/wifi-config')
+            # Create route handlers for captive portal URLs
+            def handle_captive_redirect(client, response):
+                response.WriteResponseRedirect(f'http://{ip}/wifi-config')
+            
+            # Combine main routes with captive portal routes
+            all_routes = route_handlers + [(url, 'GET', handle_captive_redirect) for url in captive_portal_urls]
+            
+            # Create web server with all routes
+            self.web_server = MicroWebSrv(routeHandlers=all_routes, port=80)
+            
+            # Remove the catch-all redirect
+            # self.web_server.SetNotFoundPageUrl(f'http://{ip}/wifi-config')
             
             self.web_server.Start(threaded=True)
 
