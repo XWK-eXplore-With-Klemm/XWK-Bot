@@ -54,6 +54,7 @@ class WlanManager:
         self.project_name = project_name
         self.config = config or Iniconf(debug=True)
         self.web_server = None
+        self._cached_networks = None  # Cache for network scan results
 
     def connect(self):
         """
@@ -272,6 +273,11 @@ class WlanManager:
 
     def _scan_networks(self):
         """Scan for available WiFi networks and sort by signal strength"""
+        """Cache results to avoid scanning every time for multiple requests"""
+        # Return cached results if available
+        if self._cached_networks is not None:
+            return self._cached_networks
+
         sta_if = network.WLAN(network.STA_IF)
         sta_if.active(True)
         time.sleep(1)
@@ -292,6 +298,9 @@ class WlanManager:
         # Sort by RSSI (strongest first) and extract only SSIDs
         final_networks = [ssid for ssid, _ in sorted(set(networks), key=lambda x: x[1], reverse=True)]
         print(final_networks)
+
+        # Cache the results
+        self._cached_networks = final_networks
 
         gc.collect()
         print("Memory after WiFi scan:", gc.mem_free())
