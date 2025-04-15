@@ -5,6 +5,7 @@ WiFi configuration manager with web configuration portal
 import gc
 import network
 import time
+import machine
 import ubinascii
 import json
 from iniconf import Iniconf
@@ -51,7 +52,7 @@ class WlanManager:
         """
         self.ui = ui or WlanManagerUi()
         self.project_name = project_name
-        self.config = config or Iniconf()
+        self.config = config or Iniconf(debug=True)
         self.web_server = None
 
     def connect(self):
@@ -62,8 +63,9 @@ class WlanManager:
         gc.collect()
         print("Memory before WiFi:", gc.mem_free())
         
-        ssid = self.config.get('WLAN_SSID')
-        password = self.config.get('WLAN_PASSWORD')
+        # wlan.connect() expects strings e.g. for config value 1234
+        ssid = str(self.config.get('WLAN_SSID'))
+        password = str(self.config.get('WLAN_PASSWORD'))
         
         if not ssid or not password:
             print("No valid WiFi configuration found")
@@ -196,32 +198,56 @@ class WlanManager:
             content = content.replace('{{ networks }}', json.dumps(networks))
         response.WriteResponseOk(contentType="text/html", content=content)
 
+        gc.collect()
+        print("Memory after wifi config GET request:", gc.mem_free())
+
     def _handle_wifi_config_post(self, client, response):
         """Handle WiFi configuration form submission"""
         form_data = client.ReadRequestPostedFormData()
         ssid = form_data.get('ssid')
         password = form_data.get('password')
+        # decode URL-encoded spaces 
+        ssid = ssid.replace('+', ' ')
+        password = password.replace('+', ' ')
+        print(f"Decoded SSID: {ssid}")
+        print(f"Decoded Password: {password}")
         
         if ssid and password:
             print(f"Saving WiFi configuration: {ssid}")
             try:
+                # Decode URL-encoded SSID and password before saving    
                 self.config.set('WLAN_SSID', ssid)
                 self.config.set('WLAN_PASSWORD', password)
+                print("Config set ssid and password")
                 self.config.save()
-                self.ui.on_config_saved(ssid)
+                print("Config saved successfully")
+
+                
+                gc.collect()
+                print("Memory after config save:", gc.mem_free())
+                # Somehow this fails... (server error, recursion limit exceed`?)
+                #self.ui.on_config_saved(ssid)
+                
                 
                 with open('templates/wlanmanager_success.html', 'r') as f:
                     content = f.read()
                 response.WriteResponseOk(contentType="text/html", content=content)
+
+                gc.collect()
+                print("Memory after html response:", gc.mem_free())
                 
                 # Schedule reset
-                import machine
-                machine.Timer(-1).init(period=2000, mode=machine.Timer.ONE_SHOT, callback=lambda t:machine.reset())
+                #import machine
+                #machine.Timer(-1).init(period=2000, mode=machine.Timer.ONE_SHOT, callback=lambda #t:machine.reset())
+
+                print("Resetting...")
+                time.sleep(2)
+                machine.reset()
                 
             except Exception as e:
                 print(f"Error saving config: {e}")
                 with open('templates/wlanmanager_error.html', 'r') as f:
-                    content = f.read().replace('{{error}}', str(e))
+                    content = f.read().replace('{{ error }}', str(e))
                 response.WriteResponseOk(contentType="text/html", content=content)
         else:
             response.WriteResponseRedirect('/wifi-config')

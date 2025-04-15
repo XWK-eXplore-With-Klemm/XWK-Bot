@@ -2,6 +2,28 @@
 gc.collect()
 print("Memory after startup collect:", gc.mem_free())
 
+"""
+from iniconf import Iniconf
+config = Iniconf()
+ssid = config.get('WLAN_SSID')
+password = config.get('WLAN_PASSWORD')
+print(ssid)
+print(password)
+
+import network
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+
+wlan.connect(str(ssid), str(password))
+
+
+if wlan.isconnected():
+    print("Successfully connected to WiFi")
+else:
+    print("Failed to connect to WiFi")
+
+"""
+
 #global placeholder_blocks
 #placeholder_blocks = [bytearray(45000)]  # 45 KB reserved
 
@@ -38,7 +60,6 @@ if not wlan.connect():
     wlan.start_ap()  # This will now start the web server internally
 
 print("Setup complete")
-
 
 
 
