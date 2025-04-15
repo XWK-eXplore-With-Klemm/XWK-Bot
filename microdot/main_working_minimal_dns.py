@@ -2,6 +2,46 @@
 gc.collect()
 print("Memory after startup collect:", gc.mem_free())
 
+import network
+import time
+import gc
+from lib.phew import dns
+import uasyncio
+
+ap = network.WLAN(network.AP_IF)
+ap.active(False)
+time.sleep(0.1)
+ap.active(True)
+
+ap.config(essid="XWK-BOT",
+            authmode=network.AUTH_OPEN,
+            channel=1,
+            hidden=False)
+        
+# Get AP IP and notify UI before loading web dependencies
+ip = ap.ifconfig()[0]
+print(f"AP IP: {ip}")
+
+gc.collect()
+print("Memory after AP:", gc.mem_free())
+
+print("Starting DNS server for captive portal...")
+dns.run_catchall(ip)
+
+gc.collect()
+print("Memory after DNS:", gc.mem_free())
+
+# Keep the script running and handle events
+print("Starting event loop...")
+try:
+    loop = uasyncio.get_event_loop()
+    loop.run_forever()
+except Exception as e:
+    print(f"Error in event loop: {e}")
+finally:
+    print("Event loop stopped")
+
+"""
 #global placeholder_blocks
 #placeholder_blocks = [bytearray(45000)]  # 45 KB reserved
 
@@ -38,7 +78,7 @@ if not wlan.connect():
     wlan.start_ap()  # This will now start the web server internally
 
 print("Setup complete")
-
+"""
 
 
 

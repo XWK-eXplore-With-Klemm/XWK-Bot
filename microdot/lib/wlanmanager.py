@@ -168,6 +168,18 @@ class WlanManager:
 
             gc.collect()
             print("Memory after web server start:", gc.mem_free())
+
+            # Start event loop to keep DNS server running
+            print("Starting event loop for DNS server...")
+            import uasyncio
+            try:
+                loop = uasyncio.get_event_loop()
+                loop.run_forever()
+            except Exception as e:
+                print(f"Error in event loop: {e}")
+            finally:
+                print("Event loop stopped")
+            
             return True
             
         except Exception as e:
