@@ -2,6 +2,11 @@ https://github.com/miguelgrinberg/microdot
 
 https://microdot.readthedocs.io/en/latest/
 
+## Problems
+
+It just does not work together with my code. It keeps crashing Wifi.
+
+
 ## Setup
 
 Download from https://github.com/miguelgrinberg/microdot/tree/main/src/microdot into lib/microdot:

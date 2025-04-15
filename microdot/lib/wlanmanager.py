@@ -141,38 +141,31 @@ class WlanManager:
         print(f"SSID: {ap_ssid}")
         print(f"IP: {ip}")
 
+        gc.collect()
+        print("Memory after AP:", gc.mem_free())
+
         try:
-            print("Starting web server...")
-            gc.collect()
-            print("Memory before web server:", gc.mem_free())
-            
-            # Start DNS server for captive portal
-            print("Starting DNS server...")
+            print("Starting DNS server for captive portal...")
             dns.run_catchall(ip)
+
+            gc.collect()
+            print("Memory after DNS:", gc.mem_free())
             
             # Setup route handlers
             route_handlers = [
-                # Android/iOS/Windows captive portal detection
-                ('/generate_204', 'GET', self._handle_captive_portal),
-                ('/gen_204', 'GET', self._handle_captive_portal),
-                ('/ncsi.txt', 'GET', self._handle_captive_portal),
-                ('/hotspot-detect.html', 'GET', self._handle_captive_portal),
-                ('/library/test/success.html', 'GET', self._handle_captive_portal),
-                ('/connecttest.txt', 'GET', self._handle_windows_test),
-                ('/fwlink', 'GET', self._handle_captive_portal),
-                
                 # Main config routes
                 ('/wifi-config', 'GET', self._handle_wifi_config),
-                ('/wifi-config', 'POST', self._handle_wifi_config_post),
-                
-                # Scan networks route
-                ('/networks', 'GET', self._handle_network_scan)
+                ('/wifi-config', 'POST', self._handle_wifi_config_post)
             ]
             
             # Create and start web server
             self.web_server = MicroWebSrv(routeHandlers=route_handlers, port=80)
-            self.web_server.Start(threaded=True)
             
+            # Set up captive portal redirect for all unhandled URLs
+            self.web_server.SetNotFoundPageUrl(f'http://{ip}/wifi-config')
+            
+            self.web_server.Start(threaded=True)
+
             gc.collect()
             print("Memory after web server start:", gc.mem_free())
             return True
@@ -181,24 +174,14 @@ class WlanManager:
             print("Error starting web services:", e)
             return False
 
-    def _handle_captive_portal(self, client, response):
-        """Redirect captive portal detection to config page"""
-        ap = network.WLAN(network.AP_IF)
-        ip = ap.ifconfig()[0]
-        response.WriteResponseRedirect(f'http://{ip}/wifi-config')
-
-    def _handle_windows_test(self, client, response):
-        """Handle Windows connection test"""
-        response.WriteResponseOk(content="Microsoft Connect Test")
-
     def _handle_wifi_config(self, client, response):
         """Serve WiFi configuration page"""
         networks = self._scan_networks()
         with open('templates/wlanmanager_config.html', 'r') as f:
             content = f.read()
             # Simple template replacement
-            content = content.replace('{{project_name}}', self.project_name)
-            content = content.replace('{{networks}}', json.dumps(networks))
+            content = content.replace('{{ project_name }}', self.project_name)
+            content = content.replace('{{ networks }}', json.dumps(networks))
         response.WriteResponseOk(contentType="text/html", content=content)
 
     def _handle_wifi_config_post(self, client, response):
@@ -231,11 +214,6 @@ class WlanManager:
         else:
             response.WriteResponseRedirect('/wifi-config')
 
-    def _handle_network_scan(self, client, response):
-        """Handle network scan request"""
-        networks = self._scan_networks()
-        response.WriteResponseJSONOk(networks)
-
     def _scan_networks(self):
         """Scan for available WiFi networks and sort by signal strength"""
         sta_if = network.WLAN(network.STA_IF)
@@ -256,4 +234,10 @@ class WlanManager:
             time.sleep(1)
         
         # Sort by RSSI (strongest first) and extract only SSIDs
-        return [ssid for ssid, _ in sorted(set(networks), key=lambda x: x[1], reverse=True)] 
+        final_networks = [ssid for ssid, _ in sorted(set(networks), key=lambda x: x[1], reverse=True)]
+        print(final_networks)
+
+        gc.collect()
+        print("Memory after WiFi scan:", gc.mem_free())
+        
+        return final_networks
