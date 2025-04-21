@@ -12,7 +12,38 @@
         <script type="text/javascript" src="js/script.js"></script>
         <script type="text/javascript" src="js/pixel_editor.js"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js" type="text/javascript" charset="utf-8"></script> -->
-        <script type="text/javascript" src="js/ace.js"></script>
+        <!-- <script type="text/javascript" src="js/ace.js"></script> -->
+
+        <script>
+            // Allow scripts to be loaded from CDN or fall back to (slow) local version
+            function loadScripts(scripts, postLoad) {
+                scripts.forEach(function(urls) {
+                    var script = document.createElement('script');
+                    script.src = urls[0];
+                    script.onerror = function() {
+                        var s = document.createElement('script');
+                        s.src = urls[1];
+                        s.onload = postLoad;
+                        document.head.appendChild(s);
+                    };
+                    script.onload = postLoad;
+                    document.head.appendChild(script);
+                });
+            }
+
+            loadScripts([
+                ["https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js", "js/ace.js"]
+            ], function() /* = postLoad */ {
+
+                // Ace editor initialization
+                initEditor();
+                var editor = ace.edit("editor");
+                editor.setOptions({
+                    fontFamily: "monospace",
+                    fontSize: "15px"
+                });
+            });
+        </script>        
     </head>
     <body onkeydown="return handleKeyDown(event);">
         <div id="sidebar-left">
@@ -54,14 +85,5 @@
         <script src="js/webrepl.min.js"></script>
         <!-- Auto-connect to WebREPL with empty password -->
         <script src="js/webrepl_auto.js"></script>
-        <script>
-            initEditor();
-            // Configure Ace editor font size
-            var editor = ace.edit("editor");
-            editor.setOptions({
-                fontFamily: "monospace",
-                fontSize: "15px"
-            });
-        </script>
     </body>
 </html>
