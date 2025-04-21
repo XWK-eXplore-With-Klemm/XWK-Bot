@@ -31,6 +31,7 @@ else:
 # print("Memory after placeholder blocks:", gc.mem_free())
 
 import bot
+bot.reset()
 bot.write("Starting XWK-Bot...", color=bot.WHITE)
 
 import gc

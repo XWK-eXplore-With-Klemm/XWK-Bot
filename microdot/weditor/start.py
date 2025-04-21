@@ -270,6 +270,7 @@ def save_file_options(httpClient, httpResponse):
         content=""
     )
 
+# New (temp?) fix for non-working pmanager.py run/stop with exec and reset
 @MicroWebSrv.route('/run')
 def run(httpClient, httpResponse):
     args = httpClient.GetRequestQueryParams()
@@ -286,15 +287,15 @@ def run(httpClient, httpResponse):
         content = {"stopped": True, "message": "Stopping. Wait for reset"}
         _respond(httpResponse, content)
         
-        # Stop all robot functions
         import bot
-        bot.stop()  # Stop motors
-        bot.shutup()  # Stop beeper
-        bot.rgb_led(bot.BLACK)  # Turn off RGB LED
+        bot.reset()
+
         # Perform hard reset
         import machine
-        machine.reset()  # Changed from soft_reset to reset
+        machine.reset()
+
         return  # Exit after sending response
+    
     elif name:
         dprint("Starting process {}".format(name))
         menu.stop()
@@ -552,6 +553,6 @@ def start_debug():
 def start():
     mws.Start(threaded=True)
 
-#start()
-start_debug()
+start()
+#start_debug()
 

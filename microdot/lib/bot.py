@@ -593,3 +593,10 @@ BUTTON_A = Pin(config.get('A_PIN'), Pin.IN, Pin.PULL_UP)
 
 def is_pressed(button):
     return not button.value()  # Returns True if button is pressed (low)
+
+
+def reset():
+    stop()
+    shutup()
+    rgb_led(BLACK)
+
