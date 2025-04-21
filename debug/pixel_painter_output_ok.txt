@@ -1,0 +1,17 @@
+[--WEB DEBUG After save complete - Memory: free=87584, alloc=48992, total=136576, used=35.9%--]
+[--WEB DEBUG Starting process rainbowtree--]
+Finished 79 79 b"\x03\n\rimport weditor.pmanager;\n\rweditor.pmanager._reload_process('rainbowtree')\n\r\x03\x03"
+Traceback (most recent call last):
+  File "boot.py", line 16, in <module>
+  File "rainbowtree.py", line 50, in <module>
+  File "rainbowtree.py", line 43, in display_rainbow
+  File "lib/pixel_painter_lib.py", line 76, in write_leds
+  File "lib/pixel_painter_lib.py", line 69, in set_matrix_brightness
+KeyboardInterrupt: 
+MicroPython v1.24.1 on 2024-11-29; Generic ESP32 module with ESP32
+Type "help()" for more information.
+>>> 
+>>> import weditor.pmanager;
+>>> weditor.pmanager._reload_process('rainbowtree')
+Running module: rainbowtree
+Rainbowtree

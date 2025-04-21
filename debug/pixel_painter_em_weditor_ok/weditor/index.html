@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>XWK MicroPython Editor</title>
+        <script src="js/term.min.js"></script>
+        <link rel="stylesheet" href="style.css"/>
+        <style type="text/css" media="screen">
+        </style>
+        <script type="text/javascript" src="js/actions.js"></script>
+        <script type="text/javascript" src="js/script.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body onkeydown="return handleKeyDown(event);">
+        <div id="sidebar-left">
+            <div id="logo">
+                <img src="xwk-logo.png" alt="XWK Bot" style="width: 100%; padding: 10px; box-sizing: border-box;">
+            </div>
+            <div id="left">
+                LOADING FILES
+            </div>
+            <div id="sidebar-footer">
+                <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 20px; background-color: #aaa;">RESET</button>
+                <div><a href="mailto:xwk@k.ull.at">(C) 2024-2025 XWK</a></div>
+                <div><a href="https://github.com/vsolina/micropython-web-editor">MPy web editor</a></div>
+            </div>
+        </div>
+        <div class="file-holder">
+            <div id="file-header">
+                <span id="active-path">/</span>
+                <button id="action-rename" onclick="actionRenameFile()" style="background-color: #dd00ff;">RENAME</button>
+                <button id="action-delete" onclick="actionDeleteFile()" style="background-color: #0000ff;">DELETE</button>
+                <button id="action-save" title="ctrl/cmd + S" onclick="actionSaveFile();" style="background-color: #00ff00;">SAVE</button>
+                <button id="action-save-run" onclick="actionSaveRunFile();" style="background-color: yellow;">SAVE + RUN</button>
+                <button id="action-stop" onclick="actionStop();" style="background-color: #ff0000;">STOP</button>
+            </div>
+            <div class="eholder">
+                <pre id="editor">LOADING EDITOR</pre>
+            </div>
+            <div id="splitter">
+                <div class="splitter-handle">
+                    <div class="drag-handle">⋮⋮⋮</div>
+                </div>
+            </div>
+            <div id="term"></div>
+        </div>
+        <div id="notification"></div>
+
+        <script src="js/webrepl.min.js"></script>
+        <!-- Auto-connect to WebREPL with empty password -->
+        <script src="js/webrepl_auto.js"></script>
+        <script>
+            initEditor();
+            // Configure Ace editor font size
+            var editor = ace.edit("editor");
+            editor.setOptions({
+                fontFamily: "monospace",
+                fontSize: "15px"
+            });
+        </script>
+    </body>
+</html>
