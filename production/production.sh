@@ -25,7 +25,7 @@ if [ "$NO_FLASH" = false ]; then
     echo "Flashing Micropython firmware"
     # Download latest version from https://micropython.org/download/ESP32_GENERIC/
     # mpremote reset --bootloader;
-    esptool.py --chip esp32 --baud 921600 write_flash -z 0x1000 production/ESP32_GENERIC-20241129-v1.24.1.bin
+    esptool.py --chip esp32 --baud 921600 write_flash -z 0x1000 production/ESP32_GENERIC-20250415-v1.25.0.bin
     echo
 
     echo "Waiting 3 seconds for device to settle..."
