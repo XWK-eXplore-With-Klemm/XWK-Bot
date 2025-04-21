@@ -24,7 +24,7 @@
             </div>
             <div id="sidebar-footer">
                 <button onclick="openPixelEditor()" style="width: 100%; margin-bottom: 8px; background-color: #ccc;">PIXEL PAINTER</button>
-                <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8px; background-color: #aaa;">RESET</button>
+                <!-- <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8px; background-color: #aaa;">RESET</button> -->
                 <button onclick="actionOTAUpdate()" style="width: 100%; margin-bottom: 20px; background-color: #888;">UPDATE</button>
                 <div><a href="https://xwk.ull.at">(C) 2024-2025 XWK</a></div>
                 <div><a href="https://github.com/vsolina/micropython-web-editor">MPy web editor</a></div>
@@ -37,7 +37,7 @@
                 <button id="action-delete" onclick="actionDeleteFile()" style="background-color: #0000ff;">DELETE</button>
                 <button id="action-save" title="ctrl/cmd + S" onclick="actionSaveFile();" style="background-color: #00ff00;">SAVE</button>
                 <button id="action-save-run" onclick="actionSaveRunFile();" style="background-color: yellow;">SAVE + RUN</button>
-                <button id="action-stop" onclick="actionStop();" style="background-color: #ff0000;">STOP</button>
+                <button id="action-stop" onclick="actionStop();" style="background-color: #ff0000;">STOP/RESET</button>
             </div>
             <div class="eholder">
                 <pre id="editor">LOADING EDITOR</pre>
