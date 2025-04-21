@@ -3,9 +3,18 @@ import json
 import sys
 import network
 import gc
+import _thread
 from microWebSrv import MicroWebSrv
 import menu  
 
+def run_program(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            code = f.read()
+        exec(code)
+    except Exception as e:
+        import sys
+        sys.print_exception(e)
 
 DEBUG_PRINT = True
 
@@ -266,17 +275,26 @@ def run(httpClient, httpResponse):
     args = httpClient.GetRequestQueryParams()
     name = args.get('name', None)
     stop = args.get('stop', None)
-    content = {}
+    content = {"error": "Unknown error"}
+    
+    gc.collect()
+    dprint("Memory before run: {}".format(gc.mem_free()))
+    
     if stop:
-        dprint("Stopping process")
-        import weditor.pmanager
-        weditor.pmanager.stop_process()
+        dprint("Stopping process and performing reset")
+        # Send response first
+        content = {"stopped": True, "message": "Stopping. Wait for reset"}
+        _respond(httpResponse, content)
+        
         # Stop all robot functions
         import bot
         bot.stop()  # Stop motors
         bot.shutup()  # Stop beeper
         bot.rgb_led(bot.BLACK)  # Turn off RGB LED
-        content = {"stopped": True}
+        # Perform hard reset
+        import machine
+        machine.reset()  # Changed from soft_reset to reset
+        return  # Exit after sending response
     elif name:
         dprint("Starting process {}".format(name))
         menu.stop()
@@ -284,10 +302,21 @@ def run(httpClient, httpResponse):
         import bot
         bot.reset_terminal()
         gc.collect()
-        print("Memory before weditor.pmanager.restart_process: {}".format(gc.mem_free()))
-        import weditor.pmanager
-        weditor.pmanager.restart_process(name)
-        content = {"started": True}
+        
+        try:
+            # Ensure we have the full path with extension
+            file_path = name if name.startswith('/') else '/' + name
+            if not file_path.endswith('.py'):
+                file_path += '.py'
+            dprint("Executing file: {}".format(file_path))
+            
+            # Start program in a new thread
+            _thread.start_new_thread(run_program, (file_path,))
+            content = {"started": True}
+        except Exception as e:
+            import sys
+            sys.print_exception(e)
+            content = {"error": str(e)}
 
     _respond(httpResponse, content)
 

@@ -4,6 +4,6 @@
 
 import time
 
-for i in range(99):
+for i in range(999):
     print(f"test{i+1}")
-    time.sleep(0.1)  # Add 100ms delay between iterations
+    time.sleep(0.5)  # Add 100ms delay between iterations
