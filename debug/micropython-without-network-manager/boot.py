@@ -14,7 +14,7 @@ bot.reset_terminal()                                             # Reset the ter
 bot.network_setup()             # Setup the network
 bot.write("")                   # Write an empty line to the display
 
-import ota_check                # Try OTA update 3 timeswhen ota_flag.txt is found
+import ota_check                # Try OTA update 3 times when ota_flag.txt is found
 #ota_check.check_and_update()    
 
 import menu                     # Load the 'lib/menuy.py' library

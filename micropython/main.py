@@ -66,6 +66,10 @@ if not wlan.connect():
     wlan.start_ap()  # This will now start the web server internally
 else:
     gc.collect()  # Force garbage collection to free memory
+
+    print("Checking for OTA update flag...")
+    import ota_check                # Try OTA update 3 times when ota_flag.txt is found
+    ota_check.check_and_update()    
             
     print("Starting webrepl...")
     try:

@@ -5,8 +5,8 @@
             "hash": "b27c54f4376e7048d02209bca1b2cbab"
         },
         "main.py": {
-            "size": 2879,
-            "hash": "cab7655950baf1458915a079bfa84804"
+            "size": 3050,
+            "hash": "b943cc2db26d760b273507c1f138575f"
         },
         "templates/wlanmanager_config.html": {
             "size": 955,
@@ -57,8 +57,8 @@
             "hash": "4ed18a2a02d20c377853c9cb41267d47"
         },
         "weditor/js/script.js": {
-            "size": 7429,
-            "hash": "ba4d3ab63a23152656f95ff4f96f334a"
+            "size": 7444,
+            "hash": "67011c4468b0e41f4f9cff5a885dfb23"
         },
         "weditor/js/theme-dracula.js": {
             "size": 4821,
@@ -75,14 +75,6 @@
         "weditor/js/webrepl_auto.js": {
             "size": 2557,
             "hash": "4964785eee891a150fcac5a22e8026fc"
-        },
-        "test.py": {
-            "size": 212,
-            "hash": "292ce0efb63319237dbda02a9ee90f7c"
-        },
-        "selftest.py": {
-            "size": 3678,
-            "hash": "f344e09e8ea82358111e40ca4c167eee"
         },
         "uss_bot.py": {
             "size": 240,
@@ -139,6 +131,10 @@
         "lib/wlanmanager.py": {
             "size": 11404,
             "hash": "1f447680a6033c9321e013dadec6fd49"
+        },
+        "lib/ota_check.py": {
+            "size": 2169,
+            "hash": "4cce6a21d5e25b3fa8da6b7733486b6c"
         },
         "linefollower.py": {
             "size": 765,
