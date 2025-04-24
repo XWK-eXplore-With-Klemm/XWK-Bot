@@ -1,6 +1,8 @@
 """
 The MIT License (MIT)
 Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
+https://github.com/jczic/MicroWebSrv
+TODO: We don't use the latest version from Github which has some patches
 """
 
 

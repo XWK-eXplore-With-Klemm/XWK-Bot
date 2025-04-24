@@ -3,11 +3,20 @@ import json
 import sys
 import network
 import gc
+import _thread
 from microWebSrv import MicroWebSrv
 import menu  
 
-
 DEBUG_PRINT = True
+
+def run_program(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            code = f.read()
+        exec(code)
+    except Exception as e:
+        import sys
+        sys.print_exception(e)
 
 def dprint(string):
     if not DEBUG_PRINT:
@@ -38,16 +47,16 @@ def _respond(httpResponse, content):
         content = json.dumps(content)
     )
 
-@MicroWebSrv.route('/info')
-def get_info(httpClient, httpResponse):
-    args = httpClient.GetRequestQueryParams()
-    wlan = network.WLAN()
-    hostname = wlan.config('dhcp_hostname')
-    ip = wlan.ifconfig()[0]
-    name = hostname if hostname != 'espressif' else ip
-    content = {"name": "MPY: {}".format(name), "ip": ip, "hostname": hostname}
+# @MicroWebSrv.route('/info')
+# def get_info(httpClient, httpResponse):
+#     args = httpClient.GetRequestQueryParams()
+#     wlan = network.WLAN()
+#     hostname = wlan.config('dhcp_hostname')
+#     ip = wlan.ifconfig()[0]
+#     name = hostname if hostname != 'espressif' else ip
+#     content = {"name": "MPY: {}".format(name), "ip": ip, "hostname": hostname}
     
-    _respond(httpResponse, content)
+#     _respond(httpResponse, content)
 
 @MicroWebSrv.route('/dir')
 def get_dir(httpClient, httpResponse):
@@ -261,31 +270,56 @@ def save_file_options(httpClient, httpResponse):
         content=""
     )
 
+# New (temp?) fix for non-working pmanager.py run/stop with exec and reset
 @MicroWebSrv.route('/run')
 def run(httpClient, httpResponse):
     args = httpClient.GetRequestQueryParams()
     name = args.get('name', None)
     stop = args.get('stop', None)
-    content = {}
+    content = {"error": "Unknown error"}
+    
+    gc.collect()
+    dprint("Memory before run: {}".format(gc.mem_free()))
+    
     if stop:
-        dprint("Stopping process")
-        import weditor.pmanager
-        weditor.pmanager.stop_process()
-        # Stop all robot functions
+        dprint("Stopping process and performing reset")
+        # Send response first
+        content = {"stopped": True, "message": "Stopping. Wait for reset"}
+        _respond(httpResponse, content)
+        
         import bot
-        bot.stop()  # Stop motors
-        bot.shutup()  # Stop beeper
-        bot.rgb_led(bot.BLACK)  # Turn off RGB LED
-        content = {"stopped": True}
+        bot.reset()
+
+        # Perform hard reset
+        import machine
+        machine.reset()
+
+        return  # Exit after sending response
+    
     elif name:
         dprint("Starting process {}".format(name))
+
         menu.stop()
         dprint("Menu stopped")
+        
         import bot
         bot.reset_terminal()
-        import weditor.pmanager
-        weditor.pmanager.restart_process(name)
-        content = {"started": True}
+        gc.collect()
+        
+        try:
+            # Ensure we have the full path with extension
+            file_path = name if name.startswith('/') else '/' + name
+            if not file_path.endswith('.py'):
+                file_path += '.py'
+            dprint("Executing file: {}".format(file_path))
+            
+            # Start program in a new thread
+            _thread.start_new_thread(run_program, (file_path,))
+            content = {"started": True}
+        except Exception as e:
+            import sys
+            sys.print_exception(e)
+            content = {"error": str(e)}
 
     _respond(httpResponse, content)
 
@@ -448,34 +482,35 @@ def rename_file(httpClient, httpResponse):
         )
         return
 
-@MicroWebSrv.route('/reset')
-def reset_device(httpClient, httpResponse):
-    try:
-        dprint("Resetting device")
-        # Send success response before reset
-        httpResponse.WriteResponse(
-            code=200,
-            headers={"Access-Control-Allow-Origin": "*"},
-            contentType="application/json",
-            contentCharset="UTF-8",
-            content=json.dumps({"reset": True})
-        )
-        # Import machine for reset
-        import machine
-        # Schedule reset after response is sent
-        machine.reset()
-    except Exception as e:
-        import sys
-        sys.print_exception(e)
-        dprint("Error resetting device: {}".format(str(e)))
-        httpResponse.WriteResponse(
-            code=500,
-            headers={"Access-Control-Allow-Origin": "*"},
-            contentType="application/json",
-            contentCharset="UTF-8",
-            content=json.dumps({"error": str(e)})
-        )
-        return
+# Currently we reset via /run?stop=true
+# @MicroWebSrv.route('/reset')
+# def reset_device(httpClient, httpResponse):
+#     try:
+#         dprint("Resetting device")
+#         # Send success response before reset
+#         httpResponse.WriteResponse(
+#             code=200,
+#             headers={"Access-Control-Allow-Origin": "*"},
+#             contentType="application/json",
+#             contentCharset="UTF-8",
+#             content=json.dumps({"reset": True})
+#         )
+#         # Import machine for reset
+#         import machine
+#         # Schedule reset after response is sent
+#         machine.reset()
+#     except Exception as e:
+#         import sys
+#         sys.print_exception(e)
+#         dprint("Error resetting device: {}".format(str(e)))
+#         httpResponse.WriteResponse(
+#             code=500,
+#             headers={"Access-Control-Allow-Origin": "*"},
+#             contentType="application/json",
+#             contentCharset="UTF-8",
+#             content=json.dumps({"error": str(e)})
+#         )
+#         return
 
 @MicroWebSrv.route('/ota/update', 'POST')
 def ota_update(httpClient, httpResponse):
@@ -506,20 +541,21 @@ def ota_update(httpClient, httpResponse):
 
 mws = MicroWebSrv(webPath="/weditor")
 
-def start_debug():
-    dprint("STARTING WEB SERVER")
-    try:
-        mws.Start(threaded=False)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        dprint("STOPPING WEB SERVER")
-        mws.Stop()
-        mws._server.close()
-        del sys.modules['microWebSrv']
+# def start_debug():
+#     dprint("STARTING WEB SERVER")
+#     try:
+#         mws.Start(threaded=False)
+#     except KeyboardInterrupt:
+#         pass
+#     finally:
+#         dprint("STOPPING WEB SERVER")
+#         mws.Stop()
+#         mws._server.close()
+#         del sys.modules['microWebSrv']
 
 def start():
     mws.Start(threaded=True)
 
 start()
+#start_debug()
 

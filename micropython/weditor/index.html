@@ -12,7 +12,38 @@
         <script type="text/javascript" src="js/script.js"></script>
         <script type="text/javascript" src="js/pixel_editor.js"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js" type="text/javascript" charset="utf-8"></script> -->
-        <script type="text/javascript" src="js/ace.js"></script>
+        <!-- <script type="text/javascript" src="js/ace.js"></script> -->
+
+        <script>
+            // Allow scripts to be loaded from CDN or fall back to (slow) local version
+            function loadScripts(scripts, postLoad) {
+                scripts.forEach(function(urls) {
+                    var script = document.createElement('script');
+                    script.src = urls[0];
+                    script.onerror = function() {
+                        var s = document.createElement('script');
+                        s.src = urls[1];
+                        s.onload = postLoad;
+                        document.head.appendChild(s);
+                    };
+                    script.onload = postLoad;
+                    document.head.appendChild(script);
+                });
+            }
+
+            loadScripts([
+                ["https://cdnjs.cloudflare.com/ajax/libs/ace/1.11.2/ace.js", "js/ace.js"]
+            ], function() /* = postLoad */ {
+
+                // Ace editor initialization
+                initEditor();
+                var editor = ace.edit("editor");
+                editor.setOptions({
+                    fontFamily: "monospace",
+                    fontSize: "15px"
+                });
+            });
+        </script>        
     </head>
     <body onkeydown="return handleKeyDown(event);">
         <div id="sidebar-left">
@@ -24,7 +55,7 @@
             </div>
             <div id="sidebar-footer">
                 <button onclick="openPixelEditor()" style="width: 100%; margin-bottom: 8px; background-color: #ccc;">PIXEL PAINTER</button>
-                <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8px; background-color: #aaa;">RESET</button>
+                <!-- <button onclick="actionResetDevice()" style="width: 100%; margin-bottom: 8px; background-color: #aaa;">RESET</button> -->
                 <button onclick="actionOTAUpdate()" style="width: 100%; margin-bottom: 20px; background-color: #888;">UPDATE</button>
                 <div><a href="https://xwk.ull.at">(C) 2024-2025 XWK</a></div>
                 <div><a href="https://github.com/vsolina/micropython-web-editor">MPy web editor</a></div>
@@ -37,7 +68,7 @@
                 <button id="action-delete" onclick="actionDeleteFile()" style="background-color: #0000ff;">DELETE</button>
                 <button id="action-save" title="ctrl/cmd + S" onclick="actionSaveFile();" style="background-color: #00ff00;">SAVE</button>
                 <button id="action-save-run" onclick="actionSaveRunFile();" style="background-color: yellow;">SAVE + RUN</button>
-                <button id="action-stop" onclick="actionStop();" style="background-color: #ff0000;">STOP</button>
+                <button id="action-stop" onclick="actionStop();" style="background-color: #ff0000;">STOP/RESET</button>
             </div>
             <div class="eholder">
                 <pre id="editor">LOADING EDITOR</pre>
@@ -54,14 +85,5 @@
         <script src="js/webrepl.min.js"></script>
         <!-- Auto-connect to WebREPL with empty password -->
         <script src="js/webrepl_auto.js"></script>
-        <script>
-            initEditor();
-            // Configure Ace editor font size
-            var editor = ace.edit("editor");
-            editor.setOptions({
-                fontFamily: "monospace",
-                fontSize: "15px"
-            });
-        </script>
     </body>
 </html>
