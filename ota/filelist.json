@@ -1,20 +1,32 @@
 {
     "files": {
+        "main.py": {
+            "size": 2458,
+            "hash": "efc466d54366a27720a1b13bca27fcbe"
+        },
+        "templates/wlanmanager_config.html": {
+            "size": 955,
+            "hash": "8270fd3c8c0afc30886daad7a679be65"
+        },
+        "templates/wlanmanager_error.html": {
+            "size": 388,
+            "hash": "33175d4a19d41b1c246ccc5df5d3bc67"
+        },
+        "templates/wlanmanager_success.html": {
+            "size": 367,
+            "hash": "866b740117cbc2504c488c327b0d4816"
+        },
         "weditor/xwk-logo.png": {
-            "size": 3399,
-            "hash": "656c62f8662dd679efd33b72c152272a"
+            "size": 1616,
+            "hash": "8a78830997315bde01314330e66e589f"
         },
         "weditor/start.py": {
-            "size": 17387,
-            "hash": "2029cf184a94d5344b50a5e4f6b3bfff"
+            "size": 18493,
+            "hash": "ef60a418620e5afd5f726557dbff571a"
         },
         "weditor/index.html": {
-            "size": 3370,
-            "hash": "86b8fae1bffd8e5834fcd1d814aaa5a6"
-        },
-        "weditor/pmanager.py": {
-            "size": 1550,
-            "hash": "27e234a3f80acd69b75812e972f2d2eb"
+            "size": 4319,
+            "hash": "6ea7ec66c4b976c8323c4ff45921145f"
         },
         "weditor/style.css": {
             "size": 4502,
@@ -60,6 +72,10 @@
             "size": 2557,
             "hash": "4964785eee891a150fcac5a22e8026fc"
         },
+        "test.py": {
+            "size": 212,
+            "hash": "292ce0efb63319237dbda02a9ee90f7c"
+        },
         "selftest.py": {
             "size": 3678,
             "hash": "f344e09e8ea82358111e40ca4c167eee"
@@ -72,9 +88,13 @@
             "size": 304,
             "hash": "4eeecf1ce6267842ede94104d2212ff1"
         },
-        "lib/ST7735.py": {
-            "size": 31245,
-            "hash": "c707a3076badc52141986dfd904c5f55"
+        "lib/wlan_manager_ui_bot.py": {
+            "size": 2367,
+            "hash": "404df3d7bd2e82ac9daeef15075631d5"
+        },
+        "lib/ST7735_minimal.py": {
+            "size": 7637,
+            "hash": "08bf76cf6c8feda86ecc72695db13625"
         },
         "lib/sysfont.py": {
             "size": 8395,
@@ -93,28 +113,24 @@
             "hash": "c52623bbc10a7895d5dbf762916fad0f"
         },
         "lib/microWebSrv.py": {
-            "size": 34127,
-            "hash": "2b3a30076e982ecf1c6f3da8e3519426"
+            "size": 34237,
+            "hash": "067d18628f95e74acd14f06ff99298f3"
         },
         "lib/bot.py": {
-            "size": 27627,
-            "hash": "7d023991d538d2d0faef50d4e880c80d"
+            "size": 19302,
+            "hash": "7c41abbcab5f0bcd8e76f14bac949c64"
+        },
+        "lib/phew/dns.py": {
+            "size": 2190,
+            "hash": "684c5bedcaa012468c94ff7634be7653"
         },
         "lib/menu.py": {
             "size": 5496,
             "hash": "71582b02848982695014014287215aec"
         },
-        "lib/VL53L0X.py": {
-            "size": 9214,
-            "hash": "4f843dbb2872cbdd2bcdfbffe5e2bff1"
-        },
-        "lib/ota_check.py": {
-            "size": 2169,
-            "hash": "4cce6a21d5e25b3fa8da6b7733486b6c"
-        },
-        "boot.py": {
-            "size": 1291,
-            "hash": "dc4766830fa37aad4aa4738feeef816a"
+        "lib/wlanmanager.py": {
+            "size": 11404,
+            "hash": "1f447680a6033c9321e013dadec6fd49"
         }
     }
 }

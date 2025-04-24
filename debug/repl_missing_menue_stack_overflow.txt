@@ -1,0 +1,18 @@
+webrepl missing
+
+[--WEB DEBUG File sending completed--]
+[--WEB DEBUG After sending complete file - Memory: free=61584, alloc=74992, total=136576, used=54.9%--]
+[--WEB DEBUG Starting save for file: /selftest.py--]
+[--WEB DEBUG Before save operation - Memory: free=62672, alloc=73904, total=136576, used=54.1%--]
+[--WEB DEBUG File save completed, total bytes: 0--]
+[--WEB DEBUG After save complete - Memory: free=62416, alloc=74160, total=136576, used=54.3%--]
+Traceback (most recent call last):
+  File "/lib/menu.py", line 39, in check
+  File "/lib/menu.py", line 22, in init_if_needed
+RuntimeError: maximum recursion depth exceeded
+[--WEB DEBUG Memory before run: 62736--]
+[--WEB DEBUG Starting process selftest--]
+[--WEB DEBUG Menu stopped--]
+[--WEB DEBUG Executing file: /selftest.py--]
+[--WEB DEBUG Memory before run: 67200--]
+[--WEB DEBUG Stopping process and performing reset--]
