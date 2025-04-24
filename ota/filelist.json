@@ -1,8 +1,12 @@
 {
     "files": {
+        "uss_write.py": {
+            "size": 263,
+            "hash": "b27c54f4376e7048d02209bca1b2cbab"
+        },
         "main.py": {
-            "size": 2458,
-            "hash": "efc466d54366a27720a1b13bca27fcbe"
+            "size": 2879,
+            "hash": "cab7655950baf1458915a079bfa84804"
         },
         "templates/wlanmanager_config.html": {
             "size": 955,
@@ -80,6 +84,10 @@
             "size": 3678,
             "hash": "f344e09e8ea82358111e40ca4c167eee"
         },
+        "uss_bot.py": {
+            "size": 240,
+            "hash": "f307c41833f7eeb1a85291a4fd3c2aec"
+        },
         "webrepl_cfg.py": {
             "size": 10,
             "hash": "dc21618ef6bd888b2ea68a4b19713304"
@@ -89,8 +97,8 @@
             "hash": "4eeecf1ce6267842ede94104d2212ff1"
         },
         "lib/wlan_manager_ui_bot.py": {
-            "size": 2367,
-            "hash": "404df3d7bd2e82ac9daeef15075631d5"
+            "size": 2535,
+            "hash": "8220c0319140a0b7724612278c9d7713"
         },
         "lib/ST7735_minimal.py": {
             "size": 7637,
@@ -125,12 +133,16 @@
             "hash": "684c5bedcaa012468c94ff7634be7653"
         },
         "lib/menu.py": {
-            "size": 5496,
-            "hash": "71582b02848982695014014287215aec"
+            "size": 5522,
+            "hash": "da127a0e45f469d4161afffe667d4804"
         },
         "lib/wlanmanager.py": {
             "size": 11404,
             "hash": "1f447680a6033c9321e013dadec6fd49"
+        },
+        "linefollower.py": {
+            "size": 765,
+            "hash": "04503420a82c61667383df67ca32841f"
         }
     }
 }

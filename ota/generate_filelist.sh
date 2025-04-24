@@ -11,9 +11,12 @@ BLACKLIST=(
     "pymakr.conf"               # Pymakr config
 
     # Example programs which the users should write themself:
-    "linefollower.py"
-    "uss_bot.py"
-    "uss_write.py"
+    #"linefollower.py"
+    #"uss_bot.py"
+    #"uss_write.py"
+
+    # Other stuff
+    "test.py"
 )
 
 # Create file list in JSON format

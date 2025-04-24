@@ -113,6 +113,7 @@ function loadedFile(fname, lines) {
 // Files to hide by default
 const BLACKLISTED_FILES = [
     'boot.py',
+    'main.py',
     'config.ini',
     'webrepl_cfg.py',
     '*.json'
