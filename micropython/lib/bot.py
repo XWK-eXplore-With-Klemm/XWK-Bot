@@ -426,28 +426,48 @@ def motor(direction_left, speed_left, direction_right, speed_right):
     if speed_left > 0 or speed_right > 0:
         time.sleep_ms(MIN_DURATION_MS)
 
-def forward(speed=10):
+def forward(speed=20):
     """Move forward with kick-start"""
     motor('forward', speed, 'forward', speed)
     
-def backward(speed=10):
+def backward(speed=20):
     """Move backward with kick-start"""
     motor('backward', speed, 'backward', speed)
     
 def turn(speed=30, direction=None):
+    """Turn in specified direction with kick-start
+    
+    Args:
+        speed: Motor speed (0-100), default 30 for reliable turning
+        direction: False/0/'L' for left, True/1/'R' for right
+    """
     if direction == False or direction == 0 or direction == 'L':
         turn_left(speed)
     else:
         turn_right(speed)
     
-def turn_left(speed=20):
+def turn_left(speed=30):
+    """Turn left with kick-start
+    
+    Args:
+        speed: Motor speed (0-100), default 30 for reliable turning
+    """
     motor('forward', 0, 'forward', speed)
     
-def turn_right(speed=20):
+def turn_right(speed=30):
+    """Turn right with kick-start
+    
+    Args:
+        speed: Motor speed (0-100), default 30 for reliable turning
+    """
     motor('forward', speed, 'forward', 0)   
     
-def turn_random(speed=20):
-    """Turn in a random direction with specified speed"""
+def turn_random(speed=30):
+    """Turn in a random direction with kick-start
+    
+    Args:
+        speed: Motor speed (0-100), default 30 for reliable turning
+    """
     import random
     if random.choice([True, False]):
         turn_left(speed)
@@ -456,6 +476,51 @@ def turn_random(speed=20):
 
 def stop():
     motor(None, 0, None, 0)
+
+# Step movement functions - execute a single movement and stop
+def step_forward(duration=1, speed=20):
+    """Execute a single forward movement for a fixed duration then stop.
+    
+    Args:
+        duration: How long to move in seconds (can be fractional, e.g. 0.5 for half a second)
+        speed: Motor speed (0-100), default 20 for reliable movement
+    """
+    forward(speed)
+    sleep(duration)
+    stop()
+
+def step_backward(duration=1, speed=20):
+    """Execute a single backward movement for a fixed duration then stop.
+    
+    Args:
+        duration: How long to move in seconds (can be fractional, e.g. 0.5 for half a second)
+        speed: Motor speed (0-100), default 20 for reliable movement
+    """
+    backward(speed)
+    sleep(duration)
+    stop()
+
+def step_left(duration=0.75, speed=30):
+    """Execute a single left turn for a fixed duration then stop.
+    
+    Args:
+        duration: How long to turn in seconds (can be fractional, e.g. 0.3 for 0.3 seconds)
+        speed: Motor speed (0-100), default 30 for reliable turning
+    """
+    turn_left(speed)
+    sleep(duration)
+    stop()
+
+def step_right(duration=0.75, speed=30):
+    """Execute a single right turn for a fixed duration then stop.
+    
+    Args:
+        duration: How long to turn in seconds (can be fractional, e.g. 0.3 for 0.3 seconds)
+        speed: Motor speed (0-100), default 30 for reliable turning
+    """
+    turn_right(speed)
+    sleep(duration)
+    stop()
 
 stop()    
             
