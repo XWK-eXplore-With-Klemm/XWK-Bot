@@ -288,8 +288,8 @@ INT2_B.freq(MOTOR_PWM_FREQUENCY)
 # Motor control constants
 MIN_SPEED = 0  # Minimum speed that reliably moves the motors
 MIN_DURATION_MS = 80  # Minimum duration of normal speed motor movement in milliseconds
-KICK_START_SPEED = 70  # Speed for initial kick
-KICK_START_DURATION_MS = 20  # Duration of kick in milliseconds
+KICK_START_SPEED = 80  # Speed for initial kick
+KICK_START_DURATION_MS = 25  # Duration of kick in milliseconds
 
 def motor_alignment(speed=15):
     """Interactive calibration of motor alignment
@@ -363,7 +363,7 @@ def motor(direction_left, speed_left, direction_right, speed_right):
     # Nominal voltage is around 6V for 4 AAA batteries
     # Scale up speed as voltage drops from 6V to 4.7V
     if voltage < 6.0:
-        compensation = min(6.0 / max(voltage, 4.7), 1.3)  # Max 30% boost
+        compensation = min(6.0 / max(voltage, 4.7), 1.5)  # Max 50% boost (was 30)
         speed_left = min(100, speed_left * compensation)
         speed_right = min(100, speed_right * compensation)
     
@@ -426,15 +426,15 @@ def motor(direction_left, speed_left, direction_right, speed_right):
     if speed_left > 0 or speed_right > 0:
         time.sleep_ms(MIN_DURATION_MS)
 
-def forward(speed=20):
+def forward(speed=10):
     """Move forward with kick-start"""
     motor('forward', speed, 'forward', speed)
     
-def backward(speed=20):
+def backward(speed=10):
     """Move backward with kick-start"""
     motor('backward', speed, 'backward', speed)
     
-def turn(speed=30, direction=None):
+def turn(speed=20, direction=None):
     """Turn in specified direction with kick-start
     
     Args:
@@ -446,7 +446,7 @@ def turn(speed=30, direction=None):
     else:
         turn_right(speed)
     
-def turn_left(speed=30):
+def turn_left(speed=20):
     """Turn left with kick-start
     
     Args:
@@ -454,7 +454,7 @@ def turn_left(speed=30):
     """
     motor('forward', 0, 'forward', speed)
     
-def turn_right(speed=30):
+def turn_right(speed=20):
     """Turn right with kick-start
     
     Args:
@@ -462,7 +462,7 @@ def turn_right(speed=30):
     """
     motor('forward', speed, 'forward', 0)   
     
-def turn_random(speed=30):
+def turn_random(speed=20):
     """Turn in a random direction with kick-start
     
     Args:
