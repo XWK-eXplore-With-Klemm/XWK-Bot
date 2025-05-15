@@ -244,11 +244,11 @@ def battery_voltage_warning():
         write(f"Battery soon empty! {voltage:.2f}V", color=YELLOW)
         rgb_led(YELLOW)
 
-    beep(1000, 100)
+    beep(1000, 0.1)
     sleep(0.1)
-    beep(1000, 100)
+    beep(1000, 0.1)
     sleep(0.1)
-    beep(1000, 100)        
+    beep(1000, 0.1)        
 
     sleep(1)
 
@@ -533,10 +533,10 @@ stop()
 beeper = PWM(Pin(26))
 
 # Function to beep, duty = volume/loudness
-def beep(frequencey = 1000, duration_ms = 250, duty = 256):
+def beep(frequencey = 1000, duration = 0.25 , duty = 256):
     beeper.freq(frequencey)  # Set frequency (1000 Hz is a typical beeper frequency)
     beeper.duty(duty)  # Set duty cyle to control volume
-    time.sleep_ms(duration_ms)
+    sleep(duration)
     beeper.duty(0)  # Set duty cycle to 0% to turn off beeper
     
 def shutup():
@@ -554,13 +554,14 @@ shutup()
 #     beeper.duty(0)  # Turn off beeper
     
 def sweep():
+    """Sweep the beeper frequency up and down"""
     # Sweep up in frequency
     for freq in range(500, 2001, 100):  # Start at 500 Hz, go up to 2000 Hz
-        beep(freq, 25)
+        beep(freq, 0.025)
 
     # Sweep down in frequency
     for freq in range(2000, 499, -100):  # Start at 2000 Hz, go down to 500 Hz
-        beep(freq, 25)
+        beep(freq, 0.025)
 
 ### RGB LED
 # Load RGB LED pin configuration
