@@ -1,8 +1,8 @@
 {
     "files": {
         "uss_write.py": {
-            "size": 263,
-            "hash": "b27c54f4376e7048d02209bca1b2cbab"
+            "size": 260,
+            "hash": "e50b04474323de62f3e0ae4123fc5a5c"
         },
         "main.py": {
             "size": 3050,
@@ -117,8 +117,8 @@
             "hash": "067d18628f95e74acd14f06ff99298f3"
         },
         "lib/bot.py": {
-            "size": 19302,
-            "hash": "7c41abbcab5f0bcd8e76f14bac949c64"
+            "size": 21347,
+            "hash": "40149c5927774a0b61429cfa6cff3060"
         },
         "lib/phew/dns.py": {
             "size": 2190,
