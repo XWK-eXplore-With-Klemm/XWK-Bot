@@ -639,7 +639,7 @@ def ir_is_bright_right():
 
 
 ### ### FRIENDLY FUNCTIONS
-def sleep(quantity, unit = "s"):
+def sleep(quantity = 1, unit = "s"):
     if unit == "ms":
         return time.sleep_ms(quantity)
     
