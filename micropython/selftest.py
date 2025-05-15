@@ -66,26 +66,26 @@ bot.sleep(1)
 # Test left motor
 bot.write("Left motor forward", color=bot.YELLOW)
 bot.motor('forward', 40, None, 0)
-bot.sleep(0.20)
+bot.sleep(0.2)
 bot.stop()
 bot.sleep(0.5)
 
 bot.write("Left motor backward", color=bot.YELLOW)
 bot.motor('backward', 40, None, 0)
-bot.sleep(0.20)
+bot.sleep(0.2)
 bot.stop()
 bot.sleep(0.5)
 
 # Test right motor
 bot.write("Right motor forward", color=bot.YELLOW)
 bot.motor(None, 0, 'forward', 40)
-bot.sleep(0.20)
+bot.sleep(0.2)
 bot.stop()
 bot.sleep(0.5)
 
 bot.write("Right motor backward", color=bot.YELLOW)
 bot.motor(None, 0, 'backward', 40)
-bot.sleep(0.20)
+bot.sleep(0.2)
 bot.stop()
 bot.sleep(0.5)
 
@@ -117,7 +117,7 @@ colors = [bot.RED, bot.GREEN, bot.BLUE, bot.YELLOW, bot.CYAN, bot.MAGENTA, bot.W
 for color in colors:
     bot.write(f"Displaying {COLOR_NAMES[color]}", color=color)
     bot.rgb_led(color)
-    bot.sleep(500, 'ms')
+    bot.sleep(0.5)
 
 bot.rgb_led(bot.BLACK)  # Turn off LED after test
 bot.write("RGB LED test complete", color=bot.GREEN)
