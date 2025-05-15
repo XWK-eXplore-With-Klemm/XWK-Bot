@@ -9,6 +9,11 @@ This describes how to flash new ESPs.
 - git commit
 - production/production.sh
 
+## Special setups (e.g. for Elisa school)
+- create separate branch ?
+- configure wlan in config.ini
+- generate_filelist.sh comment in the unwanted demo programs 
+
 
 ## Create image
 
